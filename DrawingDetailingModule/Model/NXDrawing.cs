@@ -78,16 +78,21 @@ namespace DrawingDetailingModule.Model
                 //Guide.InfoWriteLine($"Type: {item.GetType()}, String name: {item.ToString()}");
                 if (item.GetType() == typeof(NXOpen.Features.HolePackage))
                 {
-                    NXOpen.Features.HolePackage hole = item as NXOpen.Features.HolePackage;
-                    //TaggedObject taggedObject = NXOpen.Utilities.NXObjectManager.Get(hole.Tag);
-
-                    if (hole.GetFeatureName().Contains("Counterbored"))
+                    NXOpen.Features.HolePackage holePackage = item as NXOpen.Features.HolePackage;
+                    //TaggedObject taggedObject = NXOpen.Utilities.NXObjectManager.Get(hole.Tag);                   
+                    if (holePackage.GetFeatureName().Contains("Counterbored"))
                     {
-                        Counterbore cb = new Counterbore(hole);
+                        Counterbore cb = new Counterbore(holePackage);
+                        Guide.InfoWriteLine($"Feature type: {holePackage.FeatureType}");
+                        Guide.InfoWriteLine(cb.ToString());
+                    }
+                    else if (holePackage.GetFeatureName().Contains("Hole"))
+                    {
+                        Hole hole = new Hole(holePackage);
+                        Guide.InfoWriteLine($"Feature type: {holePackage.FeatureType}");
+                        Guide.InfoWriteLine(hole.ToString());
+                    }
 
-                        Guide.InfoWriteLine(cb.ToString());                        
-                    }          
-                    
 
                 }
                 if (item.GetType() == typeof(NXOpen.Features.Extrude))

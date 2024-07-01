@@ -14,14 +14,15 @@ namespace DrawingDetailingModule.Model
         HashSet<Point2d> points;
         
         double counterboreDiamter;
-        double holeDiameter;
         double counterDepth;
+
+        double holeDiameter;        
         int quantity;
 
         public Counterbore(HolePackage hole) 
         {            
             workPart = Session.GetSession().Parts.Work;
-            points = new HashSet<Point2d>();            
+            points = new HashSet<Point2d>();          
 
             GetPointsFromEdges(hole);
             GetHoleDetailInformation(hole);
