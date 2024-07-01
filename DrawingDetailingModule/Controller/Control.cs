@@ -13,6 +13,10 @@ namespace DrawingDetailingModule.Controller
         public Control()
         {
             drawing = new NXDrawing(this);
+            if (!drawing.IsDrawingOpen())
+            {
+                return;
+            }
         }
     }
 }
