@@ -64,8 +64,9 @@
     <Compile Include="Controller\Control.cs" />
     <Compile Include="Main\MyProgram.cs" />
     <Compile Include="Model\Counterbore.cs" />
-    <Compile Include="Model\Hole.cs" />
+    <Compile Include="Model\SimpleHole.cs" />
     <Compile Include="Model\NXDrawing.cs" />
+    <Compile Include="Model\Threaded.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Main\Unload.cs" />
   </ItemGroup>

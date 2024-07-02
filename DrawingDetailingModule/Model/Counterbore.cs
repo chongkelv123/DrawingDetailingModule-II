@@ -8,18 +8,14 @@ using NXOpen.Features;
 
 namespace DrawingDetailingModule.Model
 {
-    public class Counterbore
-    {        
-        Part workPart;
-        HashSet<Point2d> points;
-        
-        double counterboreDiamter;
-        double counterDepth;
+    public class Counterbore : SimpleHole
+    {                              
+        protected double CounterboreDiamter { get; set; }
+        protected double CounterDepth { get; set; }
 
-        double holeDiameter;        
-        int quantity;
+        const string PROCESS_ABBREVATE = "C'BORE";
 
-        public Counterbore(HolePackage hole) 
+        public Counterbore(HolePackage hole) : base(hole)
         {            
             workPart = Session.GetSession().Parts.Work;
             points = new HashSet<Point2d>();          
@@ -28,31 +24,20 @@ namespace DrawingDetailingModule.Model
             GetHoleDetailInformation(hole);
         }
 
-        private void GetHoleDetailInformation(HolePackage hole)
+        private new void GetHoleDetailInformation(HolePackage hole)
         {
             HolePackageBuilder hpBuilder = workPart.Features.CreateHolePackageBuilder(hole);
-            counterboreDiamter = hpBuilder.ScrewClearanceCounterboreDiameter.Value;
-            holeDiameter = hpBuilder.ScrewClearanceHoleDiameter.Value;
-            counterDepth = hpBuilder.ScrewClearanceCounterboreDepth.Value;
-            quantity = points.Count;
-        }
-
-        private void GetPointsFromEdges(HolePackage hole)
-        {
-            Edge[] edges = hole.GetEdges();
-            var circularEdges = edges
-                .Where(edge => edge.SolidEdgeType == Edge.EdgeType.Circular)
-                .Select(edge => edge.GetLocations()[0].Location);
-
-            circularEdges.ToList().ForEach(x => points.Add(new Point2d(x.X, x.Y)));
+            CounterboreDiamter = hpBuilder.ScrewClearanceCounterboreDiameter.Value;
+            HoleDiameter = hpBuilder.ScrewClearanceHoleDiameter.Value;
+            CounterDepth = hpBuilder.ScrewClearanceCounterboreDepth.Value;
+            Quantity = points.Count;
         }
 
         public override string ToString()
         {
-            return $"counterboreDiamter: {counterboreDiamter}\n" +
-                $"holeDiameter: {holeDiameter}\n" +
-                $"counterDepth: {counterDepth}\n" +
-                $"quantity: {quantity}\n";
+            return $"{Quantity}-{PROCESS_ABBREVATE} <O>{CounterboreDiamter:F1} DP {CounterDepth:F1},\n"+
+                $"DR <o>{HoleDiameter:F1} THRU";
+                
         }
     }
 }

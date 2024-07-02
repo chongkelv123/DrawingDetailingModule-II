@@ -19,6 +19,10 @@ namespace DrawingDetailingModule.Model
         UI ui;
         UFSession ufs;
         Control control;
+
+        const string THREADED = "Threaded";       
+        const string COUNTERBORED = "Counterbored";
+
         public NXDrawing(Control control)
         {
             session = Session.GetSession();
@@ -28,9 +32,7 @@ namespace DrawingDetailingModule.Model
 
             this.control = control;
             //System.Diagnostics.Debugger.Launch();
-            var FeatureCollection = workPart.Features;
-            //var sketchCollection = workPart.Sketches;
-            //SelectFaceMethod();
+            var FeatureCollection = workPart.Features;            
             IterateFeatures(FeatureCollection);
         }
 
@@ -74,26 +76,29 @@ namespace DrawingDetailingModule.Model
         private static void IterateFeatures(NXOpen.Features.FeatureCollection FeatureCollection)
         {
             foreach (var item in FeatureCollection)
-            {
-                //Guide.InfoWriteLine($"Type: {item.GetType()}, String name: {item.ToString()}");
+            {                
                 if (item.GetType() == typeof(NXOpen.Features.HolePackage))
                 {
                     NXOpen.Features.HolePackage holePackage = item as NXOpen.Features.HolePackage;
-                    //TaggedObject taggedObject = NXOpen.Utilities.NXObjectManager.Get(hole.Tag);                   
-                    if (holePackage.GetFeatureName().Contains("Counterbored"))
+                    //TaggedObject taggedObject = NXOpen.Utilities.NXObjectManager.Get(hole.Tag);
+                    if (holePackage.GetFeatureName().Contains("Threaded"))
                     {
-                        Counterbore cb = new Counterbore(holePackage);
-                        Guide.InfoWriteLine($"Feature type: {holePackage.FeatureType}");
+                        Threaded threaded = new Threaded(holePackage);
+                        Guide.InfoWriteLine(threaded.ToString());
+                        Guide.InfoWriteLine(threaded.ToString(threaded.GetLocation()));
+                    }
+                    else if (holePackage.GetFeatureName().Contains("Counterbored"))
+                    {
+                        Counterbore cb = new Counterbore(holePackage);                        
                         Guide.InfoWriteLine(cb.ToString());
+                        Guide.InfoWriteLine(cb.ToString(cb.GetLocation()));
                     }
-                    else if (holePackage.GetFeatureName().Contains("Hole"))
+                    else
                     {
-                        Hole hole = new Hole(holePackage);
-                        Guide.InfoWriteLine($"Feature type: {holePackage.FeatureType}");
+                        SimpleHole hole = new SimpleHole(holePackage);                        
                         Guide.InfoWriteLine(hole.ToString());
+                        Guide.InfoWriteLine(hole.ToString(hole.GetLocation()));
                     }
-
-
                 }
                 if (item.GetType() == typeof(NXOpen.Features.Extrude))
                 {
