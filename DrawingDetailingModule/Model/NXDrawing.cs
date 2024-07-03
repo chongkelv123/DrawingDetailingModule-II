@@ -18,10 +18,7 @@ namespace DrawingDetailingModule.Model
         Part workPart;
         UI ui;
         UFSession ufs;
-        Control control;
-
-        const string THREADED = "Threaded";
-        const string COUNTERBORED = "Counterbored";
+        Control control;        
 
         public NXDrawing(Control control)
         {
@@ -74,13 +71,7 @@ namespace DrawingDetailingModule.Model
         }
 
         private static void IterateFeatures(NXOpen.Features.FeatureCollection FeatureCollection)
-        {
-            const string THREADED = "THREADED";
-            const string COUNTERBORED = "COUNTERBORED";
-            const string MACHINING = "Machining";
-            const string TYPE = "Type";
-            const string REAM = "REAM";
-            const string WC = "WC";
+        {            
 
             foreach (Feature feature in FeatureCollection)
             {
@@ -89,10 +80,10 @@ namespace DrawingDetailingModule.Model
                     
                     Part part = Session.GetSession().Parts.Work;
                     AttributeIterator iterator = part.CreateAttributeIterator();
-                    iterator.SetIncludeOnlyCategory(MACHINING);
+                    iterator.SetIncludeOnlyCategory(FeatureFactory.MACHINING);
                    
                     NXOpen.Features.HolePackage holePackage = feature as NXOpen.Features.HolePackage;
-                    if (holePackage.JournalIdentifier.IndexOf(THREADED, StringComparison.OrdinalIgnoreCase) > -1)
+                    if (holePackage.JournalIdentifier.IndexOf(FeatureFactory.THREADED, StringComparison.OrdinalIgnoreCase) > -1)
                     {
                         Threaded threaded = new Threaded(holePackage);
                         threaded.GetHoleDetailInformation(holePackage);
@@ -100,16 +91,16 @@ namespace DrawingDetailingModule.Model
                         Guide.InfoWriteLine(result);
                         Guide.InfoWriteLine(threaded.ToString(threaded.GetLocation()));
                     }
-                    else if (holePackage.JournalIdentifier.IndexOf(COUNTERBORED, StringComparison.OrdinalIgnoreCase) > -1)
+                    else if (holePackage.JournalIdentifier.IndexOf(FeatureFactory.COUNTERBORED, StringComparison.OrdinalIgnoreCase) > -1)
                     {
                         if (feature.HasUserAttribute(iterator))
                         {
-                            string type = feature.GetStringUserAttribute(TYPE, 0);
+                            string type = feature.GetStringUserAttribute(FeatureFactory.TYPE, 0);
                             switch (type)
                             {
-                                case REAM:
+                                case FeatureFactory.REAM:
                                     break;
-                                case WC:
+                                case FeatureFactory.WC:
                                     break;
                                 default:
                                     break;

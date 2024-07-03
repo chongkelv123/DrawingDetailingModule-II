@@ -41,7 +41,7 @@ namespace DrawingDetailingModule.Model
             circularEdges.ToList().ForEach(x => points.Add(new Point2d(x.X, x.Y)));
         }
 
-        public string GetProcessType(HolePackage holePackage)
+        public static string GetProcessType(HolePackage holePackage)
         {
             string input = holePackage.JournalIdentifier;
             var match = Regex.Match(input, @"^(\w+)");

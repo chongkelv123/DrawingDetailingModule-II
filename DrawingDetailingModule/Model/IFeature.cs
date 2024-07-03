@@ -8,8 +8,7 @@ using NXOpen.Features;
 namespace DrawingDetailingModule.Model
 {
     interface IFeature
-    {
-        string GetProcessType(HolePackage holePackage);
+    {        
         string GetProcessAbbrevate();
         void GetFeatureDetailInformation(HolePackage holePackage);
 
