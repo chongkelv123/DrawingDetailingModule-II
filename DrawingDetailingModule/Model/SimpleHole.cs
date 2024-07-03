@@ -5,17 +5,20 @@ using System.Text;
 using System.Threading.Tasks;
 using NXOpen;
 using NXOpen.Features;
+using NXOpen.UF;
 
 namespace DrawingDetailingModule.Model
 {
     public class SimpleHole
     {
         protected Part workPart;
+        protected UFSession ufs;
         protected HashSet<Point2d> points;
 
         public double HoleDiameter { get; set; }
         public double HoleDepth { get; set; }
         public int Quantity { get; set; }
+        public bool IsThruHole {get; set;}
 
         const string PROCESS_ABBREVATE = "DR";
 
@@ -23,9 +26,10 @@ namespace DrawingDetailingModule.Model
         {
             workPart = Session.GetSession().Parts.Work;
             points = new HashSet<Point2d>();
+            ufs = UFSession.GetUFSession();
 
             GetPointsFromEdges(hole);
-            GetHoleDetailInformation(hole);
+            //GetHoleDetailInformation(hole);
         }
 
         public void GetPointsFromEdges(HolePackage hole)
@@ -38,18 +42,34 @@ namespace DrawingDetailingModule.Model
             circularEdges.ToList().ForEach(x => points.Add(new Point2d(x.X, x.Y)));
         }
 
-        public void GetHoleDetailInformation(HolePackage hole)
-        {            
+        public void GetFeatureDetailInformation(HolePackage hole)
+        {
             HolePackageBuilder hpBuilder = workPart.Features.CreateHolePackageBuilder(hole);
             HoleDiameter = hpBuilder.ScrewClearanceHoleDiameter.Value;
             HoleDepth = hpBuilder.ScrewClearanceHoleDepth.Value;
             Quantity = points.Count;
+
+            IsThruHole = AskThruHole(hole);
+        }
+
+        private bool AskThruHole(HolePackage hole)
+        {
+            int edit = 0;
+            string diameter;
+            string depth;
+            string tip_angle;
+            int thru_flag;
+            TaggedObject taggedObject = NXOpen.Utilities.NXObjectManager.Get(hole.Tag);
+            ufs.Modl.AskSimpleHoleParms(taggedObject.Tag, edit, out diameter, out depth, out tip_angle, out thru_flag);
+
+            return thru_flag == 1;
         }
 
         public override string ToString()
         {
-            string result = Quantity > 1 ? $"{Quantity}-{PROCESS_ABBREVATE} <o>{HoleDiameter:F1} THRU" :
-                $"{PROCESS_ABBREVATE} <o>{HoleDiameter:F1} THRU";
+            string depth = IsThruHole ? "THRU" : $"{HoleDepth:F1}";
+            string result = Quantity > 1 ? $"{Quantity}-{PROCESS_ABBREVATE} <o>{HoleDiameter:F1} {depth}" :
+                $"{PROCESS_ABBREVATE} <o>{HoleDiameter:F1} {depth}";
             return result;
         }
 

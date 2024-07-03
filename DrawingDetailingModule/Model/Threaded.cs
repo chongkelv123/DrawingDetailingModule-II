@@ -14,20 +14,16 @@ namespace DrawingDetailingModule.Model
         public double ThreadDepth { get; set; }
         const string PROCESS_ABBREVATE = "TAP";
         public Threaded(HolePackage hole) : base(hole)
-        {
-            workPart = Session.GetSession().Parts.Work;
-            points = new HashSet<Point2d>();
-
-            GetPointsFromEdges(hole);
-            GetHoleDetailInformation(hole);
+        {                        
+            //GetHoleDetailInformation(hole);
         }
 
-        private new void GetHoleDetailInformation(HolePackage hole)
+        public new void GetHoleDetailInformation(HolePackage hole)
         {
             HolePackageBuilder hpBuilder = workPart.Features.CreateHolePackageBuilder(hole);
             ThreadSide = hpBuilder.ThreadSize;
             ThreadDepth = hpBuilder.ThreadDepth.Value;
-            Quantity = points.Count;
+            Quantity = points.Count;       
         }
 
         public override string ToString()

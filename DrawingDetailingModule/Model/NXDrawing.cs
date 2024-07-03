@@ -20,7 +20,7 @@ namespace DrawingDetailingModule.Model
         UFSession ufs;
         Control control;
 
-        const string THREADED = "Threaded";       
+        const string THREADED = "Threaded";
         const string COUNTERBORED = "Counterbored";
 
         public NXDrawing(Control control)
@@ -32,8 +32,9 @@ namespace DrawingDetailingModule.Model
 
             this.control = control;
             //System.Diagnostics.Debugger.Launch();
-            var FeatureCollection = workPart.Features;            
+            var FeatureCollection = workPart.Features;
             IterateFeatures(FeatureCollection);
+            //SelectFaceMethod();
         }
 
         private void SelectFaceMethod()
@@ -57,7 +58,7 @@ namespace DrawingDetailingModule.Model
             var response = selManager.SelectTaggedObject(message, title, scope, keepHighlighted, typeArray, out selectedObject, out cursor);
             if (response != NXOpen.Selection.Response.Cancel && response != NXOpen.Selection.Response.Back)
             {
-                //System.Diagnostics.Debugger.Launch();           
+                //System.Diagnostics.Debugger.Launch();
                 int edit = 0;
                 string diameter1;
                 string diameter2;
@@ -67,48 +68,80 @@ namespace DrawingDetailingModule.Model
                 int thru_flag;
                 ufs.Modl.AskCBoreHoleParms(selectedObject.Tag, edit, out diameter1, out diameter2, out depth1, out depth2, out tip_angle, out thru_flag);
                 int num_points = 0;
-
-                ufs.Modl.AskPointsParms(selectedObject.Tag, out num_points, out _);
+                Guide.InfoWriteLine($"Feature name: {selectedObject.ToString()}");
             }
 
         }
 
         private static void IterateFeatures(NXOpen.Features.FeatureCollection FeatureCollection)
         {
-            foreach (var item in FeatureCollection)
-            {                
-                if (item.GetType() == typeof(NXOpen.Features.HolePackage))
+            const string THREADED = "THREADED";
+            const string COUNTERBORED = "COUNTERBORED";
+            const string MACHINING = "Machining";
+            const string TYPE = "Type";
+            const string REAM = "REAM";
+            const string WC = "WC";
+
+            foreach (Feature feature in FeatureCollection)
+            {
+                if (feature.GetType() == typeof(NXOpen.Features.HolePackage))
                 {
-                    NXOpen.Features.HolePackage holePackage = item as NXOpen.Features.HolePackage;
-                    //TaggedObject taggedObject = NXOpen.Utilities.NXObjectManager.Get(hole.Tag);
-                    if (holePackage.GetFeatureName().Contains("Threaded"))
+                    
+                    Part part = Session.GetSession().Parts.Work;
+                    AttributeIterator iterator = part.CreateAttributeIterator();
+                    iterator.SetIncludeOnlyCategory(MACHINING);
+                   
+                    NXOpen.Features.HolePackage holePackage = feature as NXOpen.Features.HolePackage;
+                    if (holePackage.JournalIdentifier.IndexOf(THREADED, StringComparison.OrdinalIgnoreCase) > -1)
                     {
                         Threaded threaded = new Threaded(holePackage);
-                        Guide.InfoWriteLine(threaded.ToString());
+                        threaded.GetHoleDetailInformation(holePackage);
+                        string result = threaded.ToString();
+                        Guide.InfoWriteLine(result);
                         Guide.InfoWriteLine(threaded.ToString(threaded.GetLocation()));
                     }
-                    else if (holePackage.GetFeatureName().Contains("Counterbored"))
+                    else if (holePackage.JournalIdentifier.IndexOf(COUNTERBORED, StringComparison.OrdinalIgnoreCase) > -1)
                     {
-                        Counterbore cb = new Counterbore(holePackage);                        
-                        Guide.InfoWriteLine(cb.ToString());
+                        if (feature.HasUserAttribute(iterator))
+                        {
+                            string type = feature.GetStringUserAttribute(TYPE, 0);
+                            switch (type)
+                            {
+                                case REAM:
+                                    break;
+                                case WC:
+                                    break;
+                                default:
+                                    break;
+                            }
+                            continue;
+                        }
+
+
+                        Counterbore cb = new Counterbore(holePackage);
+                        cb.GetHoleDetailInformation(holePackage);
+                        string result = cb.ToString();
+                        Guide.InfoWriteLine(result);
                         Guide.InfoWriteLine(cb.ToString(cb.GetLocation()));
                     }
                     else
                     {
-                        SimpleHole hole = new SimpleHole(holePackage);                        
-                        Guide.InfoWriteLine(hole.ToString());
+                        SimpleHole hole = new SimpleHole(holePackage);
+                        hole.GetFeatureDetailInformation(holePackage);
+                        string result = hole.ToString();
+                        Guide.InfoWriteLine(result);
                         Guide.InfoWriteLine(hole.ToString(hole.GetLocation()));
                     }
                 }
-                if (item.GetType() == typeof(NXOpen.Features.Extrude))
+                if (feature.GetType() == typeof(NXOpen.Features.Extrude))
                 {
-                    NXOpen.Features.Extrude extrude = item as NXOpen.Features.Extrude;
+                    NXOpen.Features.Extrude extrude = feature as NXOpen.Features.Extrude;
                     //Guide.InfoWriteLine($"Extrude feature name: {extrude.GetFeatureName()}");
                 }
-                if (item.GetType() == typeof(NXOpen.Features.PatternFeature))
+                if (feature.GetType() == typeof(NXOpen.Features.PatternFeature))
                 {
 
-                    NXOpen.Features.PatternFeature patternFeature = item as NXOpen.Features.PatternFeature;
+                    NXOpen.Features.PatternFeature patternFeature = feature as NXOpen.Features.PatternFeature;
                     var childs = patternFeature.GetAllChildren();
                     //Guide.InfoWriteLine($"PatternFeature feature name: {patternFeature.GetFeatureName()}");
                     var points = patternFeature.GetAssociatedCurvesPointsDatums();
