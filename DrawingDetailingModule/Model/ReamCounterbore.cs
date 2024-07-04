@@ -7,20 +7,24 @@ using NXOpen.Features;
 
 namespace DrawingDetailingModule.Model
 {
-    public class ReamSimpleHole : SimpleHole2
-    {        
-        public ReamSimpleHole(HolePackage hole) : base(hole)
+    public class ReamCounterbore : Counterbore2
+    {
+        public ReamCounterbore(HolePackage hole) : base(hole)
         {
         }
+
         public override string GetProcessAbbrevate() => "REAM";
 
         public override string ToString()
         {
             string depth = IsThruHole ? "THRU" : $"{HoleDepth:F1}";
-            string description = $"{GetProcessAbbrevate()} <o>{HoleDiameter:F2} H7 {depth}";
+            string description = $"{GetProcessAbbrevate()} <o>{HoleDiameter:F2} H7 {depth}\n" +                
+                $"{FeatureFactory.CBORE} <o>{CounterboreDiamter:F1} {FeatureFactory.DP} {CounterDepth:F1}";
             string result = Quantity > 1 ? $"{Quantity}-{description}" :
                 $"{description}";
             return result;
         }
     }
+
+
 }

@@ -7,32 +7,29 @@ using NXOpen.Features;
 
 namespace DrawingDetailingModule.Model
 {
-    public class WCSimpleHole : SimpleHole2
+    public class WCCounterbore : Counterbore2
     {
         Feature feature;
-        public WCSimpleHole(HolePackage hole) : base(hole)
+
+        public WCCounterbore(HolePackage hole) : base(hole)
         {
             feature = hole;
         }
         public override string GetProcessAbbrevate() => "WC";
 
         public override string ToString()
-        {            
-            string wcType = GetWCCondition(feature);            
+        {
+            string wcType = GetWCCondition(feature);
             string wcOffset = GetWCOffset(feature);
-            double wcholeDiameter  = GetWCHoleSize(HoleDiameter);
+            double wcholeDiameter = GetWCHoleSize(HoleDiameter);
 
-            string description = $"{GetProcessAbbrevate()} <o>{HoleDiameter:F2} {wcOffset} {wcType},\n" +
-                $"(<O>{wcholeDiameter} {FeatureFactory.WC_SP})";
+            string description = $"{GetProcessAbbrevate()} <o>{HoleDiameter:F2} {wcOffset} {wcType} ({wcholeDiameter} {FeatureFactory.WC_SP})\n" +
+                $"{FeatureFactory.CBORE} <o>{CounterboreDiamter:F1} {FeatureFactory.DP} {CounterDepth:F1}";
 
             string result = Quantity > 1 ? $"{Quantity}-{description}" :
                 $"{description}";
 
             return result;
         }
-
-        
     }
-
-
 }

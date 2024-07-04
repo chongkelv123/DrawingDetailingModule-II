@@ -21,6 +21,10 @@ namespace DrawingDetailingModule.Model
         public const string WC_OFFSET = "wcOffset";
         public const string WC_CONDITION = "wcCondition";
         public const string EXTRUDE = "EXTRUDE";
+        public const string DR = "DR";
+        public const string CBORE = "C'BORE";
+        public const string WC_SP = "wc sp";
+        public const string DP = "DP";
 
         public FeatureFactory()
         {
@@ -33,28 +37,38 @@ namespace DrawingDetailingModule.Model
 
             Part part = Session.GetSession().Parts.Work;
             AttributeIterator iterator = part.CreateAttributeIterator();
-            iterator.SetIncludeOnlyCategory(MACHINING);
-
+            iterator.SetIncludeOnlyTitle(TYPE);
+            string type;
             switch (processType)
             {
                 case THREADED:
                     return new Threaded2(holePackage);
-                case COUNTERBORED:
-                    return new Counterbore2(holePackage);
-                case SIMPLE:
-                    if (feature.HasUserAttribute(iterator))
+                case COUNTERBORED:                    
+                    if (!feature.HasUserAttribute(iterator))
                     {
-                        string type = feature.GetStringUserAttribute(TYPE, 0);
-                        if (type.Equals(REAM, StringComparison.OrdinalIgnoreCase))
-                        {
-                            return new ReamSimpleHole(holePackage);
-                        }
-                        else
-                        {
-                            return new WCSimpleHole(holePackage);
-                        }
-                    }                   
-                    return new SimpleHole2(holePackage);
+                        return new Counterbore2(holePackage);
+                    }
+
+                    type = feature.GetStringUserAttribute(TYPE, 0);
+                    if (type.Equals(REAM, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return new ReamCounterbore(holePackage);
+                    }
+
+                    return new WCCounterbore(holePackage);
+                case SIMPLE:
+                    if (!feature.HasUserAttribute(iterator))
+                    {
+                        return new SimpleHole2(holePackage);
+                    }
+
+                    type = feature.GetStringUserAttribute(TYPE, 0);
+                    if (type.Equals(REAM, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return new ReamSimpleHole(holePackage);
+                    }
+
+                    return new WCSimpleHole(holePackage);
                 default:
                     throw new Exception("Feature Factory Exception: did not catch error");
             }
