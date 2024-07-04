@@ -71,14 +71,13 @@ namespace DrawingDetailingModule.Model
         }
 
         private static void IterateFeatures(NXOpen.Features.FeatureCollection FeatureCollection)
-        {            
-
+        {
+            FeatureFactory factory = new FeatureFactory();
             foreach (Feature feature in FeatureCollection)
-            {
+            {                
                 if (feature.GetType() == typeof(NXOpen.Features.HolePackage))
                 {
-                    
-                    Part part = Session.GetSession().Parts.Work;
+                    /*Part part = Session.GetSession().Parts.Work;
                     AttributeIterator iterator = part.CreateAttributeIterator();
                     iterator.SetIncludeOnlyCategory(FeatureFactory.MACHINING);
                    
@@ -122,19 +121,24 @@ namespace DrawingDetailingModule.Model
                         string result = hole.ToString();
                         Guide.InfoWriteLine(result);
                         Guide.InfoWriteLine(hole.ToString(hole.GetLocation()));
-                    }
+                    }*/                    
+                    NXOpen.Features.HolePackage holePackage = feature as NXOpen.Features.HolePackage;
+                    MyFeature feat = factory.GetFeature(feature);
+                    feat.GetFeatureDetailInformation(holePackage);
+                    string result = feat.ToString();
+                    Guide.InfoWriteLine(result);
+                    Guide.InfoWriteLine(feat.ToString(feat.GetLocation()));
                 }
                 if (feature.GetType() == typeof(NXOpen.Features.Extrude))
                 {
                     NXOpen.Features.Extrude extrude = feature as NXOpen.Features.Extrude;
-                    //Guide.InfoWriteLine($"Extrude feature name: {extrude.GetFeatureName()}");
+                    //Guide.InfoWriteLine($"The JournalIdentifier: {MyFeature.GetProcessType(feature)}");
                 }
                 if (feature.GetType() == typeof(NXOpen.Features.PatternFeature))
                 {
 
                     NXOpen.Features.PatternFeature patternFeature = feature as NXOpen.Features.PatternFeature;
-                    var childs = patternFeature.GetAllChildren();
-                    //Guide.InfoWriteLine($"PatternFeature feature name: {patternFeature.GetFeatureName()}");
+                    var childs = patternFeature.GetAllChildren();                    
                     var points = patternFeature.GetAssociatedCurvesPointsDatums();
                     Part part = Session.GetSession().Parts.Work;
                     NXOpen.Features.PatternFeatureBuilder patternFeatureBuilder = part.Features.CreatePatternFeatureBuilder(patternFeature);

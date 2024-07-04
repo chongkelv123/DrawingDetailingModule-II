@@ -29,7 +29,7 @@ namespace DrawingDetailingModule.Model
 
         public abstract void GetFeatureDetailInformation(HolePackage holePackage);
 
-        public abstract string GetProcessAbbrevate();        
+        public abstract string GetProcessAbbrevate();
 
         public void GetPointsFromEdges(HolePackage hole)
         {
@@ -41,9 +41,9 @@ namespace DrawingDetailingModule.Model
             circularEdges.ToList().ForEach(x => points.Add(new Point2d(x.X, x.Y)));
         }
 
-        public static string GetProcessType(HolePackage holePackage)
+        public static string GetProcessType(Feature feature)
         {
-            string input = holePackage.JournalIdentifier;
+            string input = feature.JournalIdentifier;
             var match = Regex.Match(input, @"^(\w+)");
             if (match.Success)
             {
@@ -62,6 +62,65 @@ namespace DrawingDetailingModule.Model
             StringBuilder stringBuilder = new StringBuilder();
             points.ForEach(x => stringBuilder.Append($"{x.X:F3},{x.Y:F3}\n"));
             return stringBuilder.ToString();
+        }
+
+
+
+        public string GetWCCondition(Feature feature)
+        {            
+            AttributeIterator iterator = workPart.CreateAttributeIterator();
+
+            iterator.SetIncludeOnlyTitle(FeatureFactory.WC_CONDITION);            
+            string result = "";
+            if (feature.HasUserAttribute(iterator))
+            {
+                return feature.GetStringUserAttribute(FeatureFactory.WC_CONDITION, 0);
+            }
+            return @"S\C";
+        }
+
+        public string GetWCOffset(Feature feature)
+        {
+            AttributeIterator iterator = workPart.CreateAttributeIterator();
+            iterator.SetIncludeOnlyTitle(FeatureFactory.WC_OFFSET);
+            if (feature.HasUserAttribute(iterator))
+            {
+                return feature.GetStringUserAttribute(FeatureFactory.WC_OFFSET, 0);
+            }
+            if (GetProcessType(feature).Equals(FeatureFactory.EXTRUDE))
+            {
+                return @"TO SIZE";
+            }
+            return "H7";
+        }
+
+        public double GetWCHoleSize(double holeDiameter)
+        {
+            if (holeDiameter >= 8.0)
+            {
+                return 5.2;
+            }
+            if (holeDiameter > 4.0)
+            {
+                return 3.0;
+            }
+            if (holeDiameter > 3.0)
+            {
+                return 2.0;
+            }
+            if (holeDiameter > 2.3)
+            {
+                return 1.5;
+            }
+            if (holeDiameter > 1.4)
+            {
+                return 1.0;
+            }
+            if (holeDiameter > 0.7)
+            {
+                return 0.5;
+            }
+            throw new ArgumentOutOfRangeException("The wire cut hole diamater is too small. Please verify!!");
         }
     }
 }
