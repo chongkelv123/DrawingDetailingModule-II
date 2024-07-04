@@ -63,7 +63,6 @@
   <ItemGroup>
     <Compile Include="Controller\Control.cs" />
     <Compile Include="Main\MyProgram.cs" />
-    <Compile Include="Model\Counterbore.cs" />
     <Compile Include="Model\Counterbore2.cs" />
     <Compile Include="Model\FeatureFactory.cs" />
     <Compile Include="Model\IFeature.cs" />
@@ -71,10 +70,8 @@
     <Compile Include="Model\MyHoleFeature.cs" />
     <Compile Include="Model\ReamCounterbore.cs" />
     <Compile Include="Model\ReamSimpleHole.cs" />
-    <Compile Include="Model\SimpleHole.cs" />
     <Compile Include="Model\NXDrawing.cs" />
     <Compile Include="Model\SimpleHole2.cs" />
-    <Compile Include="Model\Threaded.cs" />
     <Compile Include="Model\Threaded2.cs" />
     <Compile Include="Model\WCCounterbore.cs" />
     <Compile Include="Model\WCSimpleHole.cs" />

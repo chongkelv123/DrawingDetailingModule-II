@@ -70,8 +70,7 @@ namespace DrawingDetailingModule.Model
         {            
             AttributeIterator iterator = workPart.CreateAttributeIterator();
 
-            iterator.SetIncludeOnlyTitle(FeatureFactory.WC_CONDITION);            
-            string result = "";
+            iterator.SetIncludeOnlyTitle(FeatureFactory.WC_CONDITION);                        
             if (feature.HasUserAttribute(iterator))
             {
                 return feature.GetStringUserAttribute(FeatureFactory.WC_CONDITION, 0);

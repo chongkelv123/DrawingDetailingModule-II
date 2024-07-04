@@ -76,58 +76,13 @@ namespace DrawingDetailingModule.Model
             foreach (Feature feature in FeatureCollection)
             {                
                 if (feature.GetType() == typeof(NXOpen.Features.HolePackage))
-                {
-                    /*Part part = Session.GetSession().Parts.Work;
-                    AttributeIterator iterator = part.CreateAttributeIterator();
-                    iterator.SetIncludeOnlyCategory(FeatureFactory.MACHINING);
-                   
-                    NXOpen.Features.HolePackage holePackage = feature as NXOpen.Features.HolePackage;
-                    if (holePackage.JournalIdentifier.IndexOf(FeatureFactory.THREADED, StringComparison.OrdinalIgnoreCase) > -1)
-                    {
-                        Threaded threaded = new Threaded(holePackage);
-                        threaded.GetHoleDetailInformation(holePackage);
-                        string result = threaded.ToString();
-                        Guide.InfoWriteLine(result);
-                        Guide.InfoWriteLine(threaded.ToString(threaded.GetLocation()));
-                    }
-                    else if (holePackage.JournalIdentifier.IndexOf(FeatureFactory.COUNTERBORED, StringComparison.OrdinalIgnoreCase) > -1)
-                    {
-                        if (feature.HasUserAttribute(iterator))
-                        {
-                            string type = feature.GetStringUserAttribute(FeatureFactory.TYPE, 0);
-                            switch (type)
-                            {
-                                case FeatureFactory.REAM:
-                                    break;
-                                case FeatureFactory.WC:
-                                    break;
-                                default:
-                                    break;
-                            }
-                            continue;
-                        }
-
-
-                        Counterbore cb = new Counterbore(holePackage);
-                        cb.GetHoleDetailInformation(holePackage);
-                        string result = cb.ToString();
-                        Guide.InfoWriteLine(result);
-                        Guide.InfoWriteLine(cb.ToString(cb.GetLocation()));
-                    }
-                    else
-                    {
-                        SimpleHole hole = new SimpleHole(holePackage);
-                        hole.GetFeatureDetailInformation(holePackage);
-                        string result = hole.ToString();
-                        Guide.InfoWriteLine(result);
-                        Guide.InfoWriteLine(hole.ToString(hole.GetLocation()));
-                    }*/                    
+                {                                     
                     NXOpen.Features.HolePackage holePackage = feature as NXOpen.Features.HolePackage;
                     MyFeature feat = factory.GetFeature(feature);
                     feat.GetFeatureDetailInformation(holePackage);
                     string result = feat.ToString();
                     Guide.InfoWriteLine(result);
-                    Guide.InfoWriteLine(feat.ToString(feat.GetLocation()));
+                    //Guide.InfoWriteLine(feat.ToString(feat.GetLocation()));
                 }
                 if (feature.GetType() == typeof(NXOpen.Features.Extrude))
                 {
