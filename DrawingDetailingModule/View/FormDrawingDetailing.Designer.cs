@@ -1,0 +1,174 @@
+﻿
+namespace DrawingDetailingModule.View
+{
+    partial class FormDrawingDetailing
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            this.btnCancel = new System.Windows.Forms.Button();
+            this.btnApply = new System.Windows.Forms.Button();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.btnSelectFace = new System.Windows.Forms.Button();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.btnPickPoint = new System.Windows.Forms.Button();
+            this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            this.SuspendLayout();
+            // 
+            // btnCancel
+            // 
+            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCancel.Location = new System.Drawing.Point(392, 407);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(126, 34);
+            this.btnCancel.TabIndex = 0;
+            this.btnCancel.Text = "&Cancel";
+            this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            // 
+            // btnApply
+            // 
+            this.btnApply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnApply.Enabled = false;
+            this.btnApply.Location = new System.Drawing.Point(524, 407);
+            this.btnApply.Name = "btnApply";
+            this.btnApply.Size = new System.Drawing.Size(126, 34);
+            this.btnApply.TabIndex = 0;
+            this.btnApply.Text = "&Apply";
+            this.btnApply.UseVisualStyleBackColor = true;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.textBox1);
+            this.groupBox1.Controls.Add(this.btnSelectFace);
+            this.groupBox1.Location = new System.Drawing.Point(12, 10);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(638, 95);
+            this.groupBox1.TabIndex = 1;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Face Selection";
+            // 
+            // textBox1
+            // 
+            this.textBox1.BackColor = System.Drawing.SystemColors.Control;
+            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textBox1.ForeColor = System.Drawing.SystemColors.WindowFrame;
+            this.textBox1.Location = new System.Drawing.Point(6, 33);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(321, 38);
+            this.textBox1.TabIndex = 2;
+            this.textBox1.Text = "Choose the face to start the detailing module with the alphabet placement. Multip" +
+    "le selection is allowed.";
+            // 
+            // btnSelectFace
+            // 
+            this.btnSelectFace.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSelectFace.Image = global::DrawingDetailingModule.Properties.Resources.cross;
+            this.btnSelectFace.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnSelectFace.Location = new System.Drawing.Point(402, 21);
+            this.btnSelectFace.Name = "btnSelectFace";
+            this.btnSelectFace.Size = new System.Drawing.Size(230, 50);
+            this.btnSelectFace.TabIndex = 0;
+            this.btnSelectFace.Text = "Select Face...";
+            this.btnSelectFace.UseVisualStyleBackColor = true;
+            this.btnSelectFace.Click += new System.EventHandler(this.btnSelectFace_Click);
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.textBox2);
+            this.groupBox2.Controls.Add(this.btnPickPoint);
+            this.groupBox2.Location = new System.Drawing.Point(12, 111);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(638, 95);
+            this.groupBox2.TabIndex = 1;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Pick a point";
+            // 
+            // textBox2
+            // 
+            this.textBox2.BackColor = System.Drawing.SystemColors.Control;
+            this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textBox2.ForeColor = System.Drawing.SystemColors.WindowFrame;
+            this.textBox2.Location = new System.Drawing.Point(6, 33);
+            this.textBox2.Multiline = true;
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(321, 38);
+            this.textBox2.TabIndex = 2;
+            this.textBox2.Text = "Indicate the position to place the description table.";
+            // 
+            // btnPickPoint
+            // 
+            this.btnPickPoint.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnPickPoint.Image = global::DrawingDetailingModule.Properties.Resources.cross;
+            this.btnPickPoint.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnPickPoint.Location = new System.Drawing.Point(402, 21);
+            this.btnPickPoint.Name = "btnPickPoint";
+            this.btnPickPoint.Size = new System.Drawing.Size(230, 50);
+            this.btnPickPoint.TabIndex = 0;
+            this.btnPickPoint.Text = "Pick a point...";
+            this.btnPickPoint.UseVisualStyleBackColor = true;
+            this.btnPickPoint.Click += new System.EventHandler(this.btnPickPoint_Click);
+            // 
+            // FormDrawingDetailing
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(662, 453);
+            this.Controls.Add(this.groupBox2);
+            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.btnApply);
+            this.Controls.Add(this.btnCancel);
+            this.Name = "FormDrawingDetailing";
+            this.Text = "Drawing Detailing Form";
+            this.TopMost = true;
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
+            this.ResumeLayout(false);
+
+        }
+
+        #endregion
+
+        private System.Windows.Forms.Button btnCancel;
+        private System.Windows.Forms.Button btnApply;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Button btnSelectFace;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Button btnPickPoint;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox textBox2;
+    }
+}

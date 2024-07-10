@@ -9,6 +9,7 @@ using NXOpenUI;
 
 using DrawingDetailingModule.Controller;
 using NXOpen.Features;
+using NXOpen.Annotations;
 
 namespace DrawingDetailingModule.Model
 {
@@ -18,7 +19,24 @@ namespace DrawingDetailingModule.Model
         Part workPart;
         UI ui;
         UFSession ufs;
-        Control control;        
+        Control control;
+
+        HashSet<Point3d> pointOnFaceCollection;
+        Tag selectedFaceTag;
+        List<TaggedObject> selectedFaces;
+        List<Point3d> locatedPoint;
+        public List<TaggedObject> SelectedFaces
+        {
+            get { return selectedFaces; }
+            set { selectedFaces = value; }
+        }
+        public List<Point3d> LocatedPoint
+        {
+            get { return locatedPoint; }
+            set { locatedPoint = value; }
+        }
+        public bool IsFaceSelected => selectedFaces.Count > 0;
+        public bool IsPointLocated => locatedPoint.Count > 0;
 
         public NXDrawing(Control control)
         {
@@ -27,11 +45,52 @@ namespace DrawingDetailingModule.Model
             workPart = session.Parts.Work;
             ui = UI.GetUI();
 
-            this.control = control;
-            //System.Diagnostics.Debugger.Launch();
-            var FeatureCollection = workPart.Features;
-            IterateFeatures(FeatureCollection);
-            //SelectFaceMethod();
+            pointOnFaceCollection = new HashSet<Point3d>();
+            selectedFaces = new List<TaggedObject>();
+            locatedPoint = new List<Point3d>();
+
+            this.control = control;                        
+        }
+
+        public List<TaggedObject> SelectFaces()
+        {
+            Selection selManager = ui.SelectionManager;
+            TaggedObject[] selectedObjects;            
+            string message = "Please choose a face to begin the Detailing process.";
+            string title = "Face Selection";
+            var scope = NXOpen.Selection.SelectionScope.WorkPartAndOccurrence;
+            var action = NXOpen.Selection.SelectionAction.ClearAndEnableSpecific;
+            bool keepHighlighted = false;
+            bool includeFeature = false;
+
+            var dimMask = new Selection.MaskTriple(NXOpen.UF.UFConstants.UF_solid_type, UFConstants.UF_solid_face_subtype, UFConstants.UF_UI_SEL_FEATURE_ANY_FACE);
+            Selection.MaskTriple[] maskArray = new Selection.MaskTriple[] { dimMask };            
+            var response = selManager.SelectTaggedObjects(message, title, scope, action, includeFeature, keepHighlighted, maskArray, out selectedObjects);
+
+            if (response == NXOpen.Selection.Response.Cancel && response == NXOpen.Selection.Response.Back)
+            {
+                //ufs.Modl.AskPointContainment(point, body, out pt_status);
+                return null;
+            }
+            return selectedObjects.ToList();
+        }
+
+        public List<Point3d> SelectScreenPosition()
+        {
+            Selection selManager = ui.SelectionManager;
+            string message = "Indicate the position to place the description table.";
+            NXOpen.View theView;
+            Point3d pt;
+
+            var resp = selManager.SelectScreenPosition(message, out theView, out pt);
+            if (resp == Selection.DialogResponse.Pick)
+            {
+                Guide.InfoWriteLine($"Point location: ({pt.X:F3}), ({pt.Y:F3}), ({pt.Z:F3})");
+                Guide.InfoWriteLine($"View name: {theView.Name}");
+            }
+            List<Point3d> result = new List<Point3d>();
+            result.Add(pt);
+            return result;
         }
 
         private void SelectFaceMethod()
@@ -39,49 +98,121 @@ namespace DrawingDetailingModule.Model
             Selection selManager = ui.SelectionManager;
             TaggedObject selectedObject;
             Point3d cursor;
-            string message = "Please select a face to be measure";
-            string title = "Selection";
+            string message = "Please choose a face to begin the Detailing process.";
+            string title = "Face Selection";
             var scope = NXOpen.Selection.SelectionScope.WorkPartAndOccurrence;
             var action = NXOpen.Selection.SelectionAction.ClearAndEnableSpecific;
             bool keepHighlighted = false;
             bool includeFeature = false;
 
-            //var dimMask = new Selection.MaskTriple(NXOpen.UF.UFConstants.UF_solid_type, UFConstants.UF_solid_face_subtype, UFConstants.UF_UI_SEL_FEATURE_ANY_FACE);
-            //Selection.MaskTriple[] maskArray = new Selection.MaskTriple[] { dimMask };
-            //var response = selManager.SelectTaggedObject(message, title, scope, action, includeFeature, keepHighlighted, maskArray, out selectedObject, out cursor);
+            var dimMask = new Selection.MaskTriple(NXOpen.UF.UFConstants.UF_solid_type, UFConstants.UF_solid_face_subtype, UFConstants.UF_UI_SEL_FEATURE_ANY_FACE);
+            Selection.MaskTriple[] maskArray = new Selection.MaskTriple[] { dimMask };
+            var response = selManager.SelectTaggedObject(message, title, scope, action, includeFeature, keepHighlighted, maskArray, out selectedObject, out cursor);
 
-            Selection.SelectionType[] typeArray = { Selection.SelectionType.Features };
-
-            var response = selManager.SelectTaggedObject(message, title, scope, keepHighlighted, typeArray, out selectedObject, out cursor);
-            if (response != NXOpen.Selection.Response.Cancel && response != NXOpen.Selection.Response.Back)
+            if (response == NXOpen.Selection.Response.Cancel && response == NXOpen.Selection.Response.Back)
             {
-                //System.Diagnostics.Debugger.Launch();
-                int edit = 0;
-                string diameter1;
-                string diameter2;
-                string depth1;
-                string depth2;
-                string tip_angle;
-                int thru_flag;
-                ufs.Modl.AskCBoreHoleParms(selectedObject.Tag, edit, out diameter1, out diameter2, out depth1, out depth2, out tip_angle, out thru_flag);
-                int num_points = 0;
-                Guide.InfoWriteLine($"Feature name: {selectedObject.ToString()}");
+                //ufs.Modl.AskPointContainment(point, body, out pt_status);
+                return;
             }
 
+            selectedFaceTag = selectedObject.Tag;
+
+            var FeatureCollection = workPart.Features;
+            IterateFeatures(FeatureCollection);
+
+            NXOpen.Annotations.PmiPreferencesBuilder pmiPreferencesBuilder;
+            pmiPreferencesBuilder = workPart.PmiSettingsManager.CreatePreferencesBuilder();
+            double currentTextSize = GetCurrentTextSize(pmiPreferencesBuilder);
+            SetTextSize(pmiPreferencesBuilder, 10.0);
+
+            //string[] textLines = new string[] { "Test1", "Text2", "Qty: 2" };
+            //Point3d origin = new Point3d(200, 50, 0);            
+
+            //AxisOrientation axisOrientation = AxisOrientation.Horizontal;
+            //NXOpen.Annotations.Note note = workPart.Annotations.CreateNote(textLines, origin, axisOrientation, null, null);
+
+
+            TableSection table = CreateTable(new Point3d(500, 600, 0));
+
+            SetTextSize(pmiPreferencesBuilder, currentTextSize);
+            pmiPreferencesBuilder.Destroy();
+        }
+
+        private TableSection CreateTable(Point3d insertionPoint)
+        {
+            int numOfColumns = 3, numOfRows = 8;
+            double colWidth = 200.0;
+            PmiTableSection nullPmiTableSection = null;
+            PmiTableBuilder pmiTableBuilder;
+            pmiTableBuilder = workPart.Annotations.PmiTableSections.CreatePmiTableBuilder(nullPmiTableSection);
+
+            pmiTableBuilder.NumberOfColumns = numOfColumns;
+            pmiTableBuilder.NumberOfRows = numOfRows;
+            pmiTableBuilder.ColumnWidth = colWidth;
+
+
+            pmiTableBuilder.Origin.OriginPoint = insertionPoint;
+
+            NXObject tableObj = pmiTableBuilder.Commit();
+
+            //System.Diagnostics.Debugger.Launch();
+            TableSection table = tableObj as TableSection;
+
+
+
+            table.SetName("Machining Table");
+
+            Tag cell = Tag.Null;
+            Tag row = Tag.Null;
+            Tag column = Tag.Null;
+            Tag tabNote = Tag.Null;
+
+            ufs.Tabnot.AskTabularNoteOfSection(table.Tag, out tabNote);
+            ufs.Tabnot.AskNthRow(tabNote, 0, out row);
+            ufs.Tabnot.AskNthColumn(tabNote, 0, out column);
+
+            ufs.Tabnot.AskCellAtRowCol(row, column, out cell);
+            ufs.Tabnot.SetCellText(cell, "HOLE");
+            ufs.Tabnot.SetColumnWidth(column, 60);
+
+            ufs.Tabnot.AskNthColumn(tabNote, 1, out column);
+            ufs.Tabnot.AskCellAtRowCol(row, column, out cell);
+            ufs.Tabnot.SetCellText(cell, "DESCRIPTION");
+            ufs.Tabnot.SetColumnWidth(column, 200);
+            
+            ufs.Tabnot.AskNthColumn(tabNote, 2, out column);
+            ufs.Tabnot.AskCellAtRowCol(row, column, out cell);
+            ufs.Tabnot.SetCellText(cell, "QTY");
+            ufs.Tabnot.SetColumnWidth(column, 60);            
+
+            pmiTableBuilder.Destroy();
+            return table;
+        }
+
+        private static void SetTextSize(PmiPreferencesBuilder pmiPreferencesBuilder, double currentTextSize)
+        {
+            pmiPreferencesBuilder.AnnotationStyle.LetteringStyle.GeneralTextSize = currentTextSize;
+            pmiPreferencesBuilder.Commit();
+        }
+
+        private static double GetCurrentTextSize(PmiPreferencesBuilder pmiPreferencesBuilder)
+        {
+            return pmiPreferencesBuilder.AnnotationStyle.LetteringStyle.GeneralTextSize;
         }
 
         private static void IterateFeatures(NXOpen.Features.FeatureCollection FeatureCollection)
         {
             FeatureFactory factory = new FeatureFactory();
             foreach (Feature feature in FeatureCollection)
-            {                
+            {
                 if (feature.GetType() == typeof(NXOpen.Features.HolePackage))
-                {                                     
+                {
                     NXOpen.Features.HolePackage holePackage = feature as NXOpen.Features.HolePackage;
                     MyFeature feat = factory.GetFeature(feature);
                     feat.GetFeatureDetailInformation(holePackage);
                     string result = feat.ToString();
                     Guide.InfoWriteLine(result);
+
                     //Guide.InfoWriteLine(feat.ToString(feat.GetLocation()));
                 }
                 if (feature.GetType() == typeof(NXOpen.Features.Extrude))
@@ -93,7 +224,7 @@ namespace DrawingDetailingModule.Model
                 {
 
                     NXOpen.Features.PatternFeature patternFeature = feature as NXOpen.Features.PatternFeature;
-                    var childs = patternFeature.GetAllChildren();                    
+                    var childs = patternFeature.GetAllChildren();
                     var points = patternFeature.GetAssociatedCurvesPointsDatums();
                     Part part = Session.GetSession().Parts.Work;
                     NXOpen.Features.PatternFeatureBuilder patternFeatureBuilder = part.Features.CreatePatternFeatureBuilder(patternFeature);
