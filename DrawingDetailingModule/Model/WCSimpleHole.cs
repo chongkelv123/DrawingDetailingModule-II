@@ -23,12 +23,9 @@ namespace DrawingDetailingModule.Model
             double wcholeDiameter  = GetWCHoleSize(HoleDiameter);
 
             string description = $"{GetProcessAbbrevate()} <o>{HoleDiameter:F2} {wcOffset} {wcType}, " +
-                $"(<O>{wcholeDiameter} {FeatureFactory.WC_SP})";
+                $"(<O>{wcholeDiameter} {FeatureFactory.WC_SP})";            
 
-            string result = Quantity > 1 ? $"{Quantity}-{description}" :
-                $"{description}";
-
-            return result;
+            return description;
         }
 
         

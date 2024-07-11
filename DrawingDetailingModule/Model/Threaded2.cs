@@ -19,8 +19,8 @@ namespace DrawingDetailingModule.Model
 
         public override string ToString()
         {
-            string result = Quantity > 1 ? $"{Quantity}-{GetProcessAbbrevate()} {ThreadSide} DP {ThreadDepth:F1}" :
-                $"{GetProcessAbbrevate()} {ThreadSide} DP {ThreadDepth:F1}";
+            string result = $"{GetProcessAbbrevate()} {ThreadSide} DP {ThreadDepth:F1}";
+
             return result;
         }
 

@@ -37,9 +37,8 @@ namespace DrawingDetailingModule.Model
             string depth = IsThruHole ? "THRU" : $"{HoleDepth:F1}";
             string description = $"{GetProcessAbbrevate()} <o>{CounterboreDiamter:F1} {FeatureFactory.DP} {CounterDepth:F1}, " +
                 $"{FeatureFactory.DR} <o>{HoleDiameter:F1} {depth}";
-            string result = Quantity > 1 ? $"{Quantity}-{description}" :
-                $"{description}";
-            return result;            
+            
+            return description;            
         }
 
         public override string GetProcessAbbrevate() => "C'BORE";

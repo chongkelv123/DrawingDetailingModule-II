@@ -43,8 +43,8 @@ namespace DrawingDetailingModule.Model
         public override string ToString()
         {
             string depth = IsThruHole ? "THRU" : $"{HoleDepth:F1}";
-            string result = Quantity > 1 ? $"{Quantity}-{GetProcessAbbrevate()} <o>{HoleDiameter:F1} {depth}" :
-                $"{GetProcessAbbrevate()} <o>{HoleDiameter:F1} {depth}";
+            string result = $"{GetProcessAbbrevate()} <o>{HoleDiameter:F1} {depth}";
+
             return result;
         }
 

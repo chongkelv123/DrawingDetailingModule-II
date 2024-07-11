@@ -50,15 +50,25 @@ namespace DrawingDetailingModule.View
         }
 
         private void btnPickPoint_Click(object sender, EventArgs e)
-        {
-            control.GetDrawing.LocatedPoint = control.GetDrawing.SelectScreenPosition();
-            updateBtnPickPointStage();
-            updateBtnApplyStage();
+        {            
+            try
+            {
+                control.GetDrawing.LocatedPoint = control.GetDrawing.SelectScreenPosition();
+                updateBtnPickPointStage();
+                updateBtnApplyStage();
+            }
+            catch (Exception err)
+            {
+                control.GetDrawing.ShowMessageBox(
+                    "Error", 
+                    NXOpen.NXMessageBox.DialogType.Error, 
+                    $"You have accidentaly click the button twice.\n Here is the error message: {err.Message}.");
+            }
         }
 
         private void updateBtnPickPointStage()
         {
-            if (control.GetDrawing.SelectedFaces.Count > 0)
+            if (control.GetDrawing.LocatedPoint.Count > 0)
             {
                 btnPickPoint.Image = Properties.Resources.correct;
             }

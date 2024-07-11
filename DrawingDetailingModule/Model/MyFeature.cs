@@ -36,7 +36,7 @@ namespace DrawingDetailingModule.Model
             Edge[] edges = feature.GetEdges();
             var circularEdges = edges
                 .Where(edge => edge.SolidEdgeType == Edge.EdgeType.Circular)
-                .Select(edge => edge.GetLocations()[0].Location);
+                .Select(edge => edge.GetLocations()[0].Location);     
 
             circularEdges.ToList().ForEach(x => points.Add(new Point2d(x.X, x.Y)));
         }        

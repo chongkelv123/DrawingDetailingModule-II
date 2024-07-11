@@ -10,7 +10,6 @@ namespace DrawingDetailingModule.Model
 {
     public class FeatureFactory
     {
-
         public const string THREADED = "THREADED";
         public const string COUNTERBORED = "COUNTERBORED";
         public const string SIMPLE = "SIMPLE";

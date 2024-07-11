@@ -86,8 +86,8 @@ namespace DrawingDetailingModule.Model
             {
                 return null;
             }
-            Guide.InfoWriteLine($"Point location: ({pt.X:F3}), ({pt.Y:F3}), ({pt.Z:F3})");
-            Guide.InfoWriteLine($"View name: {theView.Name}");
+            //Guide.InfoWriteLine($"Point location: ({pt.X:F3}), ({pt.Y:F3}), ({pt.Z:F3})");
+            //Guide.InfoWriteLine($"View name: {theView.Name}");
             List<Point3d> result = new List<Point3d>();
             result.Add(pt);
             return result;
@@ -136,6 +136,107 @@ namespace DrawingDetailingModule.Model
 
             SetTextSize(pmiPreferencesBuilder, currentTextSize);
             pmiPreferencesBuilder.Destroy();
+        }
+
+        public TableSection CreateTable(Point3d insertionPoint, List<MachiningDescriptionModel> descriptionModels)
+        {
+            int numOfColumns = 3, numOfRows = descriptionModels.Count + 1;
+            double colWidth = 200.0;
+            PmiTableSection nullPmiTableSection = null;
+            PmiTableBuilder pmiTableBuilder;
+            pmiTableBuilder = workPart.Annotations.PmiTableSections.CreatePmiTableBuilder(nullPmiTableSection);
+
+            pmiTableBuilder.NumberOfColumns = numOfColumns;
+            pmiTableBuilder.NumberOfRows = numOfRows;
+            pmiTableBuilder.ColumnWidth = colWidth;
+
+            pmiTableBuilder.Origin.OriginPoint = insertionPoint;
+
+            NXObject tableObj = pmiTableBuilder.Commit();
+
+            TableSection table = tableObj as TableSection;
+
+            table.SetName("Machining Table");
+
+            Tag cell = Tag.Null;
+            Tag row = Tag.Null;
+            Tag column = Tag.Null;
+            Tag tabNote = Tag.Null;            
+
+            ufs.Tabnot.AskTabularNoteOfSection(table.Tag, out tabNote);
+            ufs.Tabnot.AskNthRow(tabNote, 0, out row);
+            ufs.Tabnot.AskNthColumn(tabNote, 0, out column);
+
+            ufs.Tabnot.AskCellAtRowCol(row, column, out cell);
+            ufs.Tabnot.SetCellText(cell, "HOLE");
+            ufs.Tabnot.SetColumnWidth(column, 60);
+
+            ufs.Tabnot.AskNthColumn(tabNote, 1, out column);
+            ufs.Tabnot.AskCellAtRowCol(row, column, out cell);
+            ufs.Tabnot.SetCellText(cell, "DESCRIPTION");
+            ufs.Tabnot.SetColumnWidth(column, 200);
+
+            ufs.Tabnot.AskNthColumn(tabNote, 2, out column);
+            ufs.Tabnot.AskCellAtRowCol(row, column, out cell);
+            ufs.Tabnot.SetCellText(cell, "QTY");
+            ufs.Tabnot.SetColumnWidth(column, 60);
+            
+            int numOfColumn = 3;
+            for (int i = 0; i < descriptionModels.Count; i++)
+            {
+                ufs.Tabnot.AskNthRow(tabNote, i+1, out row);
+                for (int j = 0; j < numOfColumn; j++)
+                {                    
+                    ufs.Tabnot.AskNthColumn(tabNote, j, out column);
+                    ufs.Tabnot.AskCellAtRowCol(row, column, out cell);
+                    if(j == 0)
+                    {
+                        ufs.Tabnot.SetCellText(cell, NumberToAlphabet(i));
+                    }
+                    else if(j == 1)
+                    {
+                        ufs.Tabnot.SetCellText(cell, descriptionModels[i].Description);
+                    }
+                    else
+                    {
+                        ufs.Tabnot.SetCellText(cell, descriptionModels[i].Quantity.ToString());
+                    }
+                }
+            }
+
+            pmiTableBuilder.Destroy();
+            return table;
+        }
+
+        public string NumberToAlphabet(int number)
+        {
+            int asciiDec = 65;
+            char c;
+            StringBuilder stringBuilder = new StringBuilder();
+
+            asciiDec += number;
+            if(asciiDec == 73)
+            {
+                asciiDec++;
+            }else if (asciiDec == 79)
+            {
+                asciiDec++;
+            }
+
+            if(asciiDec <= 90)
+            {
+                c = (char)asciiDec;
+                stringBuilder.Append(c);
+            }
+            else
+            {
+                c = (char)asciiDec;
+                stringBuilder.Append(c);
+                char d = (char)(number - 26);
+                stringBuilder.Append(d);
+            }            
+
+            return stringBuilder.ToString();
         }
 
         public TableSection CreateTable(Point3d insertionPoint)
@@ -247,10 +348,12 @@ namespace DrawingDetailingModule.Model
             }
         }
 
-        public void IterateFeatures()
+        public List<MachiningDescriptionModel> IterateFeatures()
         {
             var featureCollection = workPart.Features;
             FeatureFactory factory = new FeatureFactory();
+            
+            List<MachiningDescriptionModel> descriptionModels = new List<MachiningDescriptionModel>();
 
             foreach (Feature feature in featureCollection)
             {
@@ -259,14 +362,20 @@ namespace DrawingDetailingModule.Model
                     NXOpen.Features.HolePackage holePackage = feature as NXOpen.Features.HolePackage;
                     MyFeature feat = factory.GetFeature(feature);
                     feat.GetFeatureDetailInformation(holePackage);
-                    string result = feat.ToString();
-                    Guide.InfoWriteLine(result);
+                    string description = feat.ToString();
+                    int qty = feat.Quantity;
+                    //MachiningDescriptionModel descModel = new MachiningDescriptionModel();
+                    //descModel.Description = description;
+                    //descModel.Quantity = qty;
+                    descriptionModels.Add(new MachiningDescriptionModel(description, qty));
                 }
                 else if (feature.GetType() == typeof(NXOpen.Features.Extrude))
                 {
                     NXOpen.Features.Extrude extrude = feature as NXOpen.Features.Extrude;
                 }
             }
+
+            return descriptionModels;
         }
 
         public bool IsDrawingOpen()

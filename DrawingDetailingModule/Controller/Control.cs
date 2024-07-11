@@ -31,10 +31,11 @@ namespace DrawingDetailingModule.Controller
         {
             double currentTextSize = GetDrawing.GetCurrentTextSize();
             GetDrawing.SetTextSize(myForm.FontSize);
+            List<MachiningDescriptionModel> descriptionModels = new List<MachiningDescriptionModel>();
             try
             {
-                GetDrawing.IterateFeatures();
-                GetDrawing.CreateTable(GetDrawing.LocatedPoint[0]);
+                descriptionModels = GetDrawing.IterateFeatures();
+                GetDrawing.CreateTable(GetDrawing.LocatedPoint[0], descriptionModels);
             }
             catch (Exception err)
             {
