@@ -86,57 +86,11 @@ namespace DrawingDetailingModule.Model
             {
                 return null;
             }
-            //Guide.InfoWriteLine($"Point location: ({pt.X:F3}), ({pt.Y:F3}), ({pt.Z:F3})");
-            //Guide.InfoWriteLine($"View name: {theView.Name}");
+            
             List<Point3d> result = new List<Point3d>();
             result.Add(pt);
             return result;
-        }
-
-        private void SelectFaceMethod()
-        {
-            Selection selManager = ui.SelectionManager;
-            TaggedObject selectedObject;
-            Point3d cursor;
-            string message = "Please choose a face to begin the Detailing process.";
-            string title = "Face Selection";
-            var scope = NXOpen.Selection.SelectionScope.WorkPartAndOccurrence;
-            var action = NXOpen.Selection.SelectionAction.ClearAndEnableSpecific;
-            bool keepHighlighted = false;
-            bool includeFeature = false;
-
-            var dimMask = new Selection.MaskTriple(NXOpen.UF.UFConstants.UF_solid_type, UFConstants.UF_solid_face_subtype, UFConstants.UF_UI_SEL_FEATURE_ANY_FACE);
-            Selection.MaskTriple[] maskArray = new Selection.MaskTriple[] { dimMask };
-            var response = selManager.SelectTaggedObject(message, title, scope, action, includeFeature, keepHighlighted, maskArray, out selectedObject, out cursor);
-
-            if (response == NXOpen.Selection.Response.Cancel && response == NXOpen.Selection.Response.Back)
-            {
-                //ufs.Modl.AskPointContainment(point, body, out pt_status);
-                return;
-            }
-
-            selectedFaceTag = selectedObject.Tag;
-
-
-            IterateFeatures_old();
-
-            NXOpen.Annotations.PmiPreferencesBuilder pmiPreferencesBuilder;
-            pmiPreferencesBuilder = workPart.PmiSettingsManager.CreatePreferencesBuilder();
-            double currentTextSize = GetCurrentTextSize(pmiPreferencesBuilder);
-            SetTextSize(pmiPreferencesBuilder, 10.0);
-
-            //string[] textLines = new string[] { "Test1", "Text2", "Qty: 2" };
-            //Point3d origin = new Point3d(200, 50, 0);            
-
-            //AxisOrientation axisOrientation = AxisOrientation.Horizontal;
-            //NXOpen.Annotations.Note note = workPart.Annotations.CreateNote(textLines, origin, axisOrientation, null, null);
-
-
-            TableSection table = CreateTable(new Point3d(500, 600, 0));
-
-            SetTextSize(pmiPreferencesBuilder, currentTextSize);
-            pmiPreferencesBuilder.Destroy();
-        }
+        }      
 
         public TableSection CreateTable(Point3d insertionPoint, List<MachiningDescriptionModel> descriptionModels)
         {
@@ -238,63 +192,7 @@ namespace DrawingDetailingModule.Model
 
             return stringBuilder.ToString();
         }
-
-        public TableSection CreateTable(Point3d insertionPoint)
-        {
-            int numOfColumns = 3, numOfRows = 8;
-            double colWidth = 200.0;
-            PmiTableSection nullPmiTableSection = null;
-            PmiTableBuilder pmiTableBuilder;
-            pmiTableBuilder = workPart.Annotations.PmiTableSections.CreatePmiTableBuilder(nullPmiTableSection);
-
-            pmiTableBuilder.NumberOfColumns = numOfColumns;
-            pmiTableBuilder.NumberOfRows = numOfRows;
-            pmiTableBuilder.ColumnWidth = colWidth;
-
-
-            pmiTableBuilder.Origin.OriginPoint = insertionPoint;
-
-            NXObject tableObj = pmiTableBuilder.Commit();
-
-            //System.Diagnostics.Debugger.Launch();
-            TableSection table = tableObj as TableSection;
-
-
-
-            table.SetName("Machining Table");
-
-            Tag cell = Tag.Null;
-            Tag row = Tag.Null;
-            Tag column = Tag.Null;
-            Tag tabNote = Tag.Null;
-
-            ufs.Tabnot.AskTabularNoteOfSection(table.Tag, out tabNote);
-            ufs.Tabnot.AskNthRow(tabNote, 0, out row);
-            ufs.Tabnot.AskNthColumn(tabNote, 0, out column);
-
-            ufs.Tabnot.AskCellAtRowCol(row, column, out cell);
-            ufs.Tabnot.SetCellText(cell, "HOLE");
-            ufs.Tabnot.SetColumnWidth(column, 60);
-
-            ufs.Tabnot.AskNthColumn(tabNote, 1, out column);
-            ufs.Tabnot.AskCellAtRowCol(row, column, out cell);
-            ufs.Tabnot.SetCellText(cell, "DESCRIPTION");
-            ufs.Tabnot.SetColumnWidth(column, 200);
-
-            ufs.Tabnot.AskNthColumn(tabNote, 2, out column);
-            ufs.Tabnot.AskCellAtRowCol(row, column, out cell);
-            ufs.Tabnot.SetCellText(cell, "QTY");
-            ufs.Tabnot.SetColumnWidth(column, 60);
-
-            pmiTableBuilder.Destroy();
-            return table;
-        }
-
-        private static void SetTextSize(PmiPreferencesBuilder pmiPreferencesBuilder, double currentTextSize)
-        {
-            pmiPreferencesBuilder.AnnotationStyle.LetteringStyle.GeneralTextSize = currentTextSize;
-            pmiPreferencesBuilder.Commit();
-        }
+       
         public void SetTextSize(double currentTextSize)
         {
             PmiPreferencesBuilder pmiPreferencesBuilder;
@@ -302,11 +200,7 @@ namespace DrawingDetailingModule.Model
             pmiPreferencesBuilder.AnnotationStyle.LetteringStyle.GeneralTextSize = currentTextSize;
             pmiPreferencesBuilder.Commit();
         }
-
-        private static double GetCurrentTextSize(PmiPreferencesBuilder pmiPreferencesBuilder)
-        {
-            return pmiPreferencesBuilder.AnnotationStyle.LetteringStyle.GeneralTextSize;
-        }
+        
         public double GetCurrentTextSize()
         {
             PmiPreferencesBuilder pmiPreferencesBuilder;
@@ -364,9 +258,7 @@ namespace DrawingDetailingModule.Model
                     feat.GetFeatureDetailInformation(holePackage);
                     string description = feat.ToString();
                     int qty = feat.Quantity;
-                    //MachiningDescriptionModel descModel = new MachiningDescriptionModel();
-                    //descModel.Description = description;
-                    //descModel.Quantity = qty;
+                    
                     descriptionModels.Add(new MachiningDescriptionModel(description, qty));
                 }
                 else if (feature.GetType() == typeof(NXOpen.Features.Extrude))
