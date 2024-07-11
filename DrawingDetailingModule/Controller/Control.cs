@@ -26,5 +26,21 @@ namespace DrawingDetailingModule.Controller
             myForm = new FormDrawingDetailing(this);
             myForm.Show();
         }
+
+        public void Start()
+        {
+            double currentTextSize = GetDrawing.GetCurrentTextSize();
+            GetDrawing.SetTextSize(myForm.FontSize);
+            try
+            {
+                GetDrawing.IterateFeatures();
+                GetDrawing.CreateTable(GetDrawing.LocatedPoint[0]);
+            }
+            catch (Exception err)
+            {
+                GetDrawing.ShowMessageBox("Error", NXOpen.NXMessageBox.DialogType.Error, $"Error detail: {err.Message}");
+            }
+            GetDrawing.SetTextSize(currentTextSize);
+        }
     }
 }

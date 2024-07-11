@@ -44,18 +44,7 @@ namespace DrawingDetailingModule.Model
                 case THREADED:
                     return new Threaded2(holePackage);
                 case COUNTERBORED:                    
-                    if (!feature.HasUserAttribute(iterator))
-                    {
-                        return new Counterbore2(holePackage);
-                    }
-
-                    type = feature.GetStringUserAttribute(TYPE, 0);
-                    if (type.Equals(REAM, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return new ReamCounterbore(holePackage);
-                    }
-
-                    return new WCCounterbore(holePackage);
+                    return CounterBoreClassification(feature, iterator);
                 case SIMPLE:
                     if (!feature.HasUserAttribute(iterator))
                     {
@@ -70,9 +59,25 @@ namespace DrawingDetailingModule.Model
 
                     return new WCSimpleHole(holePackage);
                 default:
-                    throw new Exception("Feature Factory Exception: did not catch error");
+                    return null;
             }
 
+        }
+
+        private MyFeature CounterBoreClassification(Feature feature, AttributeIterator iterator)
+        {            
+            if (!feature.HasUserAttribute(iterator))
+            {
+                return new Counterbore2(feature);
+            }
+
+            string type = feature.GetStringUserAttribute(TYPE, 0);
+            if (type.Equals(REAM, StringComparison.OrdinalIgnoreCase))
+            {
+                return new ReamCounterbore(feature);
+            }
+
+            return new WCCounterbore(feature);
         }
     }
 }

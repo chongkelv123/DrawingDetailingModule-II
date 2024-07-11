@@ -13,7 +13,7 @@ namespace DrawingDetailingModule.Model
     {
         public double CounterboreDiamter { get; set; }
         public double CounterDepth { get; set; }
-        public Counterbore2(HolePackage hole) : base(hole)
+        public Counterbore2(Feature feature) : base(feature)
         {
         }
 
@@ -35,7 +35,7 @@ namespace DrawingDetailingModule.Model
         public override string ToString()
         {
             string depth = IsThruHole ? "THRU" : $"{HoleDepth:F1}";
-            string description = $"{GetProcessAbbrevate()} <o>{CounterboreDiamter:F1} {FeatureFactory.DP} {CounterDepth:F1}\n" +
+            string description = $"{GetProcessAbbrevate()} <o>{CounterboreDiamter:F1} {FeatureFactory.DP} {CounterDepth:F1}, " +
                 $"{FeatureFactory.DR} <o>{HoleDiameter:F1} {depth}";
             string result = Quantity > 1 ? $"{Quantity}-{description}" :
                 $"{description}";

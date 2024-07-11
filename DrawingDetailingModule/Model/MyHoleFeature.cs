@@ -16,7 +16,7 @@ namespace DrawingDetailingModule.Model
         public double HoleDepth { get; set; }        
         public bool IsThruHole { get; set; }        
 
-        protected MyHoleFeature(HolePackage hole):base(hole)
+        protected MyHoleFeature(Feature feature):base(feature)
         {            
         }                                
     

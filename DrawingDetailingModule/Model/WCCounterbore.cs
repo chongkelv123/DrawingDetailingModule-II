@@ -11,9 +11,9 @@ namespace DrawingDetailingModule.Model
     {
         Feature feature;
 
-        public WCCounterbore(HolePackage hole) : base(hole)
+        public WCCounterbore(Feature feature) : base(feature)
         {
-            feature = hole;
+            this.feature = feature;
         }
         public override string GetProcessAbbrevate() => "WC";
 

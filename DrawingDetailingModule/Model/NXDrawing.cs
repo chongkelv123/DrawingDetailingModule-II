@@ -49,13 +49,13 @@ namespace DrawingDetailingModule.Model
             selectedFaces = new List<TaggedObject>();
             locatedPoint = new List<Point3d>();
 
-            this.control = control;                        
+            this.control = control;
         }
 
         public List<TaggedObject> SelectFaces()
         {
             Selection selManager = ui.SelectionManager;
-            TaggedObject[] selectedObjects;            
+            TaggedObject[] selectedObjects;
             string message = "Please choose a face to begin the Detailing process.";
             string title = "Face Selection";
             var scope = NXOpen.Selection.SelectionScope.WorkPartAndOccurrence;
@@ -64,12 +64,11 @@ namespace DrawingDetailingModule.Model
             bool includeFeature = false;
 
             var dimMask = new Selection.MaskTriple(NXOpen.UF.UFConstants.UF_solid_type, UFConstants.UF_solid_face_subtype, UFConstants.UF_UI_SEL_FEATURE_ANY_FACE);
-            Selection.MaskTriple[] maskArray = new Selection.MaskTriple[] { dimMask };            
+            Selection.MaskTriple[] maskArray = new Selection.MaskTriple[] { dimMask };
             var response = selManager.SelectTaggedObjects(message, title, scope, action, includeFeature, keepHighlighted, maskArray, out selectedObjects);
 
             if (response == NXOpen.Selection.Response.Cancel && response == NXOpen.Selection.Response.Back)
             {
-                //ufs.Modl.AskPointContainment(point, body, out pt_status);
                 return null;
             }
             return selectedObjects.ToList();
@@ -83,11 +82,12 @@ namespace DrawingDetailingModule.Model
             Point3d pt;
 
             var resp = selManager.SelectScreenPosition(message, out theView, out pt);
-            if (resp == Selection.DialogResponse.Pick)
+            if (resp != Selection.DialogResponse.Pick)
             {
-                Guide.InfoWriteLine($"Point location: ({pt.X:F3}), ({pt.Y:F3}), ({pt.Z:F3})");
-                Guide.InfoWriteLine($"View name: {theView.Name}");
+                return null;
             }
+            Guide.InfoWriteLine($"Point location: ({pt.X:F3}), ({pt.Y:F3}), ({pt.Z:F3})");
+            Guide.InfoWriteLine($"View name: {theView.Name}");
             List<Point3d> result = new List<Point3d>();
             result.Add(pt);
             return result;
@@ -117,8 +117,8 @@ namespace DrawingDetailingModule.Model
 
             selectedFaceTag = selectedObject.Tag;
 
-            var FeatureCollection = workPart.Features;
-            IterateFeatures(FeatureCollection);
+
+            IterateFeatures_old();
 
             NXOpen.Annotations.PmiPreferencesBuilder pmiPreferencesBuilder;
             pmiPreferencesBuilder = workPart.PmiSettingsManager.CreatePreferencesBuilder();
@@ -138,7 +138,7 @@ namespace DrawingDetailingModule.Model
             pmiPreferencesBuilder.Destroy();
         }
 
-        private TableSection CreateTable(Point3d insertionPoint)
+        public TableSection CreateTable(Point3d insertionPoint)
         {
             int numOfColumns = 3, numOfRows = 8;
             double colWidth = 200.0;
@@ -179,11 +179,11 @@ namespace DrawingDetailingModule.Model
             ufs.Tabnot.AskCellAtRowCol(row, column, out cell);
             ufs.Tabnot.SetCellText(cell, "DESCRIPTION");
             ufs.Tabnot.SetColumnWidth(column, 200);
-            
+
             ufs.Tabnot.AskNthColumn(tabNote, 2, out column);
             ufs.Tabnot.AskCellAtRowCol(row, column, out cell);
             ufs.Tabnot.SetCellText(cell, "QTY");
-            ufs.Tabnot.SetColumnWidth(column, 60);            
+            ufs.Tabnot.SetColumnWidth(column, 60);
 
             pmiTableBuilder.Destroy();
             return table;
@@ -194,16 +194,30 @@ namespace DrawingDetailingModule.Model
             pmiPreferencesBuilder.AnnotationStyle.LetteringStyle.GeneralTextSize = currentTextSize;
             pmiPreferencesBuilder.Commit();
         }
+        public void SetTextSize(double currentTextSize)
+        {
+            PmiPreferencesBuilder pmiPreferencesBuilder;
+            pmiPreferencesBuilder = workPart.PmiSettingsManager.CreatePreferencesBuilder();
+            pmiPreferencesBuilder.AnnotationStyle.LetteringStyle.GeneralTextSize = currentTextSize;
+            pmiPreferencesBuilder.Commit();
+        }
 
         private static double GetCurrentTextSize(PmiPreferencesBuilder pmiPreferencesBuilder)
         {
             return pmiPreferencesBuilder.AnnotationStyle.LetteringStyle.GeneralTextSize;
         }
-
-        private static void IterateFeatures(NXOpen.Features.FeatureCollection FeatureCollection)
+        public double GetCurrentTextSize()
         {
+            PmiPreferencesBuilder pmiPreferencesBuilder;
+            pmiPreferencesBuilder = workPart.PmiSettingsManager.CreatePreferencesBuilder();
+            return pmiPreferencesBuilder.AnnotationStyle.LetteringStyle.GeneralTextSize;
+        }
+
+        public void IterateFeatures_old()
+        {
+            var featureCollection = workPart.Features;
             FeatureFactory factory = new FeatureFactory();
-            foreach (Feature feature in FeatureCollection)
+            foreach (Feature feature in featureCollection)
             {
                 if (feature.GetType() == typeof(NXOpen.Features.HolePackage))
                 {
@@ -230,14 +244,33 @@ namespace DrawingDetailingModule.Model
                     NXOpen.Features.PatternFeatureBuilder patternFeatureBuilder = part.Features.CreatePatternFeatureBuilder(patternFeature);
                     var features = patternFeatureBuilder.FeatureList;
                 }
+            }
+        }
 
+        public void IterateFeatures()
+        {
+            var featureCollection = workPart.Features;
+            FeatureFactory factory = new FeatureFactory();
+
+            foreach (Feature feature in featureCollection)
+            {
+                if (feature.GetType() == typeof(NXOpen.Features.HolePackage))
+                {
+                    NXOpen.Features.HolePackage holePackage = feature as NXOpen.Features.HolePackage;
+                    MyFeature feat = factory.GetFeature(feature);
+                    feat.GetFeatureDetailInformation(holePackage);
+                    string result = feat.ToString();
+                    Guide.InfoWriteLine(result);
+                }
+                else if (feature.GetType() == typeof(NXOpen.Features.Extrude))
+                {
+                    NXOpen.Features.Extrude extrude = feature as NXOpen.Features.Extrude;
+                }
             }
         }
 
         public bool IsDrawingOpen()
         {
-            //System.Diagnostics.Debugger.Launch();
-
             string title = "No active drawing";
             string message = "You accidentally launched the BOM command by mistake and ";
             NXMessageBox.DialogType msgboxType = NXMessageBox.DialogType.Warning;

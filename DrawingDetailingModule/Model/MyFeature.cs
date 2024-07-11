@@ -18,28 +18,28 @@ namespace DrawingDetailingModule.Model
 
         public int Quantity { get; set; }
 
-        public MyFeature(HolePackage hole)
+        public MyFeature(Feature feature)
         {
             workPart = Session.GetSession().Parts.Work;
             points = new HashSet<Point2d>();
             ufs = UFSession.GetUFSession();
 
-            GetPointsFromEdges(hole);
+            GetPointsFromEdges(feature);
         }
 
         public abstract void GetFeatureDetailInformation(HolePackage holePackage);
 
         public abstract string GetProcessAbbrevate();
 
-        public void GetPointsFromEdges(HolePackage hole)
+        public void GetPointsFromEdges(Feature feature)
         {
-            Edge[] edges = hole.GetEdges();
+            Edge[] edges = feature.GetEdges();
             var circularEdges = edges
                 .Where(edge => edge.SolidEdgeType == Edge.EdgeType.Circular)
                 .Select(edge => edge.GetLocations()[0].Location);
 
             circularEdges.ToList().ForEach(x => points.Add(new Point2d(x.X, x.Y)));
-        }
+        }        
 
         public static string GetProcessType(Feature feature)
         {

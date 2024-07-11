@@ -14,10 +14,10 @@ namespace DrawingDetailingModule.View
     public partial class FormDrawingDetailing : Form
     {
         Controller.Control control;
+        public double FontSize => (double)numFontSizeUpDown.Value;
         public FormDrawingDetailing(Controller.Control control)
         {
             InitializeComponent();
-
             this.control = control;
         }
 
@@ -35,12 +35,15 @@ namespace DrawingDetailingModule.View
 
         private void updateBtnApplyStage()
         {
-            btnApply.Enabled = control.GetDrawing.IsFaceSelected && control.GetDrawing.IsPointLocated;
+            btnApply.Enabled =
+                control.GetDrawing.IsFaceSelected &&
+                control.GetDrawing.IsPointLocated &&
+                FontSize > 0;
         }
 
         private void updateBtnSelectFaceStage()
         {
-            if(control.GetDrawing.SelectedFaces.Count > 0)
+            if (control.GetDrawing.SelectedFaces.Count > 0)
             {
                 btnSelectFace.Image = Properties.Resources.correct;
             }
@@ -59,6 +62,17 @@ namespace DrawingDetailingModule.View
             {
                 btnPickPoint.Image = Properties.Resources.correct;
             }
+        }
+
+        private void btnApply_Click(object sender, EventArgs e)
+        {
+            control.Start();
+            this.Close();
+        }
+
+        private void numFontSizeUpDown_ValueChanged(object sender, EventArgs e)
+        {
+            updateBtnApplyStage();
         }
     }
 }
