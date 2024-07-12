@@ -52,28 +52,33 @@ namespace DrawingDetailingModule.Model
             this.control = control;
         }
 
-        public List<TaggedObject> SelectFaces()
+        public List<TaggedObject> SelectBody()
         {
             Selection selManager = ui.SelectionManager;
-            TaggedObject[] selectedObjects;
-            string message = "Please choose a face to begin the Detailing process.";
-            string title = "Face Selection";
+            TaggedObject selectedObject;
+            string message = "Please choose a solid to begin the Detailing process.";
+            string title = "Solid Selection";
             var scope = NXOpen.Selection.SelectionScope.WorkPartAndOccurrence;
             var action = NXOpen.Selection.SelectionAction.ClearAndEnableSpecific;
             bool keepHighlighted = false;
             bool includeFeature = false;
+            Point3d cursor;
 
             //var dimMask = new Selection.MaskTriple(NXOpen.UF.UFConstants.UF_solid_type, UFConstants.UF_solid_face_subtype, UFConstants.UF_UI_SEL_FEATURE_ANY_FACE);
             //var dimMask = new Selection.MaskTriple(NXOpen.UF.UFConstants.UF_datum_plane_type, UFConstants.UF_solid_body_subtype, UFConstants.UF_UI_DATUM_PLANE);
+
             var dimMask = new Selection.MaskTriple(NXOpen.UF.UFConstants.UF_solid_type, UFConstants.UF_solid_body_subtype, UFConstants.UF_UI_SEL_FEATURE_BODY);
             Selection.MaskTriple[] maskArray = new Selection.MaskTriple[] { dimMask };
-            var response = selManager.SelectTaggedObjects(message, title, scope, action, includeFeature, keepHighlighted, maskArray, out selectedObjects);
+            //var response = selManager.SelectTaggedObjects(message, title, scope, action, includeFeature, keepHighlighted, maskArray, out selectedObjects);
+            var response = selManager.SelectTaggedObject(message, title, scope, action, includeFeature, keepHighlighted, maskArray,out selectedObject,out cursor);
 
             if (response == NXOpen.Selection.Response.Cancel && response == NXOpen.Selection.Response.Back)
             {
                 return null;
             }
-            return selectedObjects.ToList();
+            List<TaggedObject> result = new List<TaggedObject>();
+            result.Add(selectedObject);
+            return result;
         }
 
         public List<Point3d> SelectScreenPosition()
@@ -230,7 +235,7 @@ namespace DrawingDetailingModule.Model
                     List<Point3d> points = feat.GetLocation();
                     List<Point3d> outPoints = new List<Point3d>();
 
-                    if (IsPointContainInFace(points, selectedFaces[0].Tag, out outPoints))
+                    if (IsPointContainInBoundingBox(points, selectedFaces[0].Tag, out outPoints))
                     {
                         descriptionModels.Add(new MachiningDescriptionModel(description, outPoints.Count, outPoints));
                     }
@@ -244,7 +249,7 @@ namespace DrawingDetailingModule.Model
             return descriptionModels;
         }
 
-        private bool IsPointContainInFace(List<Point3d> points, Tag selectedFaceTag, out List<Point3d> outPoints)
+        private bool IsPointContainInBoundingBox(List<Point3d> points, Tag selectedFaceTag, out List<Point3d> outPoints)
         {
             const int INSIDE_BODY = 1;
             const int OUTSIDE_BODY = 2;

@@ -28,7 +28,7 @@ namespace DrawingDetailingModule.View
 
         private void btnSelectFace_Click(object sender, EventArgs e)
         {
-            control.GetDrawing.SelectedFaces = control.GetDrawing.SelectFaces();
+            control.GetDrawing.SelectedFaces = control.GetDrawing.SelectBody();
             updateBtnSelectFaceStage();
             updateBtnApplyStage();
         }
