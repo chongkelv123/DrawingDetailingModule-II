@@ -209,41 +209,7 @@ namespace DrawingDetailingModule.Model
             PmiPreferencesBuilder pmiPreferencesBuilder;
             pmiPreferencesBuilder = workPart.PmiSettingsManager.CreatePreferencesBuilder();
             return pmiPreferencesBuilder.AnnotationStyle.LetteringStyle.GeneralTextSize;
-        }
-
-        public void IterateFeatures_old()
-        {
-            var featureCollection = workPart.Features;
-            FeatureFactory factory = new FeatureFactory();
-            foreach (Feature feature in featureCollection)
-            {
-                if (feature.GetType() == typeof(NXOpen.Features.HolePackage))
-                {
-                    NXOpen.Features.HolePackage holePackage = feature as NXOpen.Features.HolePackage;
-                    MyFeature feat = factory.GetFeature(feature);
-                    feat.GetFeatureDetailInformation(holePackage);
-                    string result = feat.ToString();
-                    Guide.InfoWriteLine(result);
-
-                    //Guide.InfoWriteLine(feat.ToString(feat.GetLocation()));
-                }
-                if (feature.GetType() == typeof(NXOpen.Features.Extrude))
-                {
-                    NXOpen.Features.Extrude extrude = feature as NXOpen.Features.Extrude;
-                    //Guide.InfoWriteLine($"The JournalIdentifier: {MyFeature.GetProcessType(feature)}");
-                }
-                if (feature.GetType() == typeof(NXOpen.Features.PatternFeature))
-                {
-
-                    NXOpen.Features.PatternFeature patternFeature = feature as NXOpen.Features.PatternFeature;
-                    var childs = patternFeature.GetAllChildren();
-                    var points = patternFeature.GetAssociatedCurvesPointsDatums();
-                    Part part = Session.GetSession().Parts.Work;
-                    NXOpen.Features.PatternFeatureBuilder patternFeatureBuilder = part.Features.CreatePatternFeatureBuilder(patternFeature);
-                    var features = patternFeatureBuilder.FeatureList;
-                }
-            }
-        }
+        }      
 
         public List<MachiningDescriptionModel> IterateFeatures()
         {
