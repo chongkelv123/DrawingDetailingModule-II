@@ -14,14 +14,14 @@ namespace DrawingDetailingModule.Model
     {
         protected Part workPart;
         protected UFSession ufs;
-        protected HashSet<Point2d> points;
+        protected List<Point3d> points;
 
         public int Quantity { get; set; }
 
         public MyFeature(Feature feature)
         {
             workPart = Session.GetSession().Parts.Work;
-            points = new HashSet<Point2d>();
+            points = new List<Point3d>();
             ufs = UFSession.GetUFSession();
 
             GetPointsFromEdges(feature);
@@ -36,10 +36,10 @@ namespace DrawingDetailingModule.Model
             Edge[] edges = feature.GetEdges();
             var circularEdges = edges
                 .Where(edge => edge.SolidEdgeType == Edge.EdgeType.Circular)
-                .Select(edge => edge.GetLocations()[0].Location);     
+                .Select(edge => edge.GetLocations()[0].Location);
 
-            circularEdges.ToList().ForEach(x => points.Add(new Point2d(x.X, x.Y)));
-        }        
+            circularEdges.ToList().ForEach(x => points.Add(new Point3d(x.X, x.Y, x.Z)));
+        }
 
         public static string GetProcessType(Feature feature)
         {
@@ -52,9 +52,9 @@ namespace DrawingDetailingModule.Model
             return "";
         }
 
-        public List<Point2d> GetLocation()
+        public List<Point3d> GetLocation()
         {
-            return points.ToList();
+            return points;
         }
 
         public string ToString(List<Point2d> points)
@@ -67,10 +67,10 @@ namespace DrawingDetailingModule.Model
 
 
         public string GetWCCondition(Feature feature)
-        {            
+        {
             AttributeIterator iterator = workPart.CreateAttributeIterator();
 
-            iterator.SetIncludeOnlyTitle(FeatureFactory.WC_CONDITION);                        
+            iterator.SetIncludeOnlyTitle(FeatureFactory.WC_CONDITION);
             if (feature.HasUserAttribute(iterator))
             {
                 return feature.GetStringUserAttribute(FeatureFactory.WC_CONDITION, 0);

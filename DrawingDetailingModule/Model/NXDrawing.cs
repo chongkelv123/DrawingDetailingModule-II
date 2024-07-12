@@ -63,7 +63,9 @@ namespace DrawingDetailingModule.Model
             bool keepHighlighted = false;
             bool includeFeature = false;
 
-            var dimMask = new Selection.MaskTriple(NXOpen.UF.UFConstants.UF_solid_type, UFConstants.UF_solid_face_subtype, UFConstants.UF_UI_SEL_FEATURE_ANY_FACE);
+            //var dimMask = new Selection.MaskTriple(NXOpen.UF.UFConstants.UF_solid_type, UFConstants.UF_solid_face_subtype, UFConstants.UF_UI_SEL_FEATURE_ANY_FACE);
+            //var dimMask = new Selection.MaskTriple(NXOpen.UF.UFConstants.UF_datum_plane_type, UFConstants.UF_solid_body_subtype, UFConstants.UF_UI_DATUM_PLANE);
+            var dimMask = new Selection.MaskTriple(NXOpen.UF.UFConstants.UF_solid_type, UFConstants.UF_solid_body_subtype, UFConstants.UF_UI_SEL_FEATURE_BODY);
             Selection.MaskTriple[] maskArray = new Selection.MaskTriple[] { dimMask };
             var response = selManager.SelectTaggedObjects(message, title, scope, action, includeFeature, keepHighlighted, maskArray, out selectedObjects);
 
@@ -86,11 +88,11 @@ namespace DrawingDetailingModule.Model
             {
                 return null;
             }
-            
+
             List<Point3d> result = new List<Point3d>();
             result.Add(pt);
             return result;
-        }      
+        }
 
         public TableSection CreateTable(Point3d insertionPoint, List<MachiningDescriptionModel> descriptionModels)
         {
@@ -115,7 +117,7 @@ namespace DrawingDetailingModule.Model
             Tag cell = Tag.Null;
             Tag row = Tag.Null;
             Tag column = Tag.Null;
-            Tag tabNote = Tag.Null;            
+            Tag tabNote = Tag.Null;
 
             ufs.Tabnot.AskTabularNoteOfSection(table.Tag, out tabNote);
             ufs.Tabnot.AskNthRow(tabNote, 0, out row);
@@ -134,20 +136,20 @@ namespace DrawingDetailingModule.Model
             ufs.Tabnot.AskCellAtRowCol(row, column, out cell);
             ufs.Tabnot.SetCellText(cell, "QTY");
             ufs.Tabnot.SetColumnWidth(column, 60);
-            
+
             int numOfColumn = 3;
             for (int i = 0; i < descriptionModels.Count; i++)
             {
-                ufs.Tabnot.AskNthRow(tabNote, i+1, out row);
+                ufs.Tabnot.AskNthRow(tabNote, i + 1, out row);
                 for (int j = 0; j < numOfColumn; j++)
-                {                    
+                {
                     ufs.Tabnot.AskNthColumn(tabNote, j, out column);
                     ufs.Tabnot.AskCellAtRowCol(row, column, out cell);
-                    if(j == 0)
+                    if (j == 0)
                     {
                         ufs.Tabnot.SetCellText(cell, NumberToAlphabet(i));
                     }
-                    else if(j == 1)
+                    else if (j == 1)
                     {
                         ufs.Tabnot.SetCellText(cell, descriptionModels[i].Description);
                     }
@@ -169,15 +171,16 @@ namespace DrawingDetailingModule.Model
             StringBuilder stringBuilder = new StringBuilder();
 
             asciiDec += number;
-            if(asciiDec == 73)
+            if (asciiDec == 73)
             {
                 asciiDec++;
-            }else if (asciiDec == 79)
+            }
+            else if (asciiDec == 79)
             {
                 asciiDec++;
             }
 
-            if(asciiDec <= 90)
+            if (asciiDec <= 90)
             {
                 c = (char)asciiDec;
                 stringBuilder.Append(c);
@@ -188,11 +191,11 @@ namespace DrawingDetailingModule.Model
                 stringBuilder.Append(c);
                 char d = (char)(number - 26);
                 stringBuilder.Append(d);
-            }            
+            }
 
             return stringBuilder.ToString();
         }
-       
+
         public void SetTextSize(double currentTextSize)
         {
             PmiPreferencesBuilder pmiPreferencesBuilder;
@@ -200,7 +203,7 @@ namespace DrawingDetailingModule.Model
             pmiPreferencesBuilder.AnnotationStyle.LetteringStyle.GeneralTextSize = currentTextSize;
             pmiPreferencesBuilder.Commit();
         }
-        
+
         public double GetCurrentTextSize()
         {
             PmiPreferencesBuilder pmiPreferencesBuilder;
@@ -246,7 +249,7 @@ namespace DrawingDetailingModule.Model
         {
             var featureCollection = workPart.Features;
             FeatureFactory factory = new FeatureFactory();
-            
+
             List<MachiningDescriptionModel> descriptionModels = new List<MachiningDescriptionModel>();
 
             foreach (Feature feature in featureCollection)
@@ -257,9 +260,14 @@ namespace DrawingDetailingModule.Model
                     MyFeature feat = factory.GetFeature(feature);
                     feat.GetFeatureDetailInformation(holePackage);
                     string description = feat.ToString();
-                    int qty = feat.Quantity;
-                    
-                    descriptionModels.Add(new MachiningDescriptionModel(description, qty));
+
+                    List<Point3d> points = feat.GetLocation();
+                    List<Point3d> outPoints = new List<Point3d>();
+
+                    if (IsPointContainInFace(points, selectedFaces[0].Tag, out outPoints))
+                    {
+                        descriptionModels.Add(new MachiningDescriptionModel(description, outPoints.Count, outPoints));
+                    }
                 }
                 else if (feature.GetType() == typeof(NXOpen.Features.Extrude))
                 {
@@ -268,6 +276,42 @@ namespace DrawingDetailingModule.Model
             }
 
             return descriptionModels;
+        }
+
+        private bool IsPointContainInFace(List<Point3d> points, Tag selectedFaceTag, out List<Point3d> outPoints)
+        {
+            const int INSIDE_BODY = 1;
+            const int OUTSIDE_BODY = 2;
+            const int ON_BODY = 3;
+
+            bool result = false;
+            List<Point3d> pointCollection = new List<Point3d>();
+            
+            int pt_status = 0;
+            AskBoundingBox boundingBox = new AskBoundingBox(ufs, SelectedFaces[0].Tag);
+
+            foreach (Point3d p in points)
+            {
+                double[] pt = new double[] { p.X, p.Y, p.Z };
+
+                ufs.Modl.AskPointContainment(pt, SelectedFaces[0].Tag, out pt_status);
+
+                switch (pt_status)
+                {
+                    case OUTSIDE_BODY:
+                        continue;
+                    case INSIDE_BODY:
+                        continue;
+                    case ON_BODY:
+                        pointCollection.Add(p);
+                        result = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            outPoints = boundingBox.VerifyPoints(pointCollection);            
+            return result;
         }
 
         public bool IsDrawingOpen()

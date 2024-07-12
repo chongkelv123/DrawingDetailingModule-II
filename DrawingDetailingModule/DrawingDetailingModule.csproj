@@ -65,6 +65,7 @@
   <ItemGroup>
     <Compile Include="Controller\Control.cs" />
     <Compile Include="Main\MyProgram.cs" />
+    <Compile Include="Model\AskBoundingBox.cs" />
     <Compile Include="Model\Counterbore2.cs" />
     <Compile Include="Model\FeatureFactory.cs" />
     <Compile Include="Model\IFeature.cs" />
