@@ -5,20 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using NXOpen.UF;
 using NXOpen;
+using NXOpen.Utilities;
 
 namespace DrawingDetailingModule.Model
 {
     public class AskBoundingBox
-    {        
+    {
         double[] boundingBox = new double[6];
-        public enum FROM {
-            TOP = 1,
-            BOTTOM = 2,
-            LIFT,
-            RIGHT,
-            FRONT,
-            BACK
-        };
+
+        UFSession ufs;
+
         public double MinX
         {
             get { return boundingBox[0]; }
@@ -45,7 +41,8 @@ namespace DrawingDetailingModule.Model
         }
         public AskBoundingBox(UFSession ufs, Tag boundingBoxTag)
         {
-            ufs.Modl.AskBoundingBox(boundingBoxTag, boundingBox);
+            this.ufs = ufs;
+            this.ufs.Modl.AskBoundingBox(boundingBoxTag, boundingBox);
         }
 
         public bool IsFromTopDirection(double ptZ)
@@ -63,11 +60,11 @@ namespace DrawingDetailingModule.Model
         public bool IsFromRightDirection(double ptX)
         {
             return (MaxX == ptX);
-        }        
+        }
         public bool IsFromFrontDirection(double ptY)
         {
             return (MinY == ptY);
-        }       
+        }
         public bool IsFromBackDirection(double ptY)
         {
             return (MaxY == ptY);
@@ -79,7 +76,7 @@ namespace DrawingDetailingModule.Model
             HashSet<Point2d> tempPoints = new HashSet<Point2d>();
             double zValue = -1;
             foreach (Point3d p in pointCollection)
-            {                
+            {
                 tempPoints.Add(new Point2d(p.X, p.Y));
                 if (zValue == -1)
                 {
@@ -88,6 +85,19 @@ namespace DrawingDetailingModule.Model
             }
             tempPoints.ToList().ForEach(x => outPoints.Add(new Point3d(x.X, x.Y, zValue)));
             return outPoints;
+        }
+
+        public NXObject CreateBoundingBox()
+        {
+            FeatureSigns sign = FeatureSigns.Nullsign;
+            double[] corner_pt = new double[] { MinX, MinY, MinZ };
+
+            string[] edge_len = new string[] { "150.0", "550.0", "125.0" };
+            Tag blk_obj;
+            ufs.Modl.CreateBlock1(sign, corner_pt, edge_len, out blk_obj);
+
+            NXObject result = NXOpen.Utilities.NXObjectManager.Get(blk_obj) as NXObject;
+            return result;
         }
     }
 }

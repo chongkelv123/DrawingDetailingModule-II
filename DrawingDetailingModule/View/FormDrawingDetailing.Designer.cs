@@ -80,7 +80,7 @@ namespace DrawingDetailingModule.View
             this.groupBox1.Size = new System.Drawing.Size(638, 95);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Face Selection";
+            this.groupBox1.Text = "Solid body Selection";
             // 
             // textBox1
             // 
@@ -92,8 +92,7 @@ namespace DrawingDetailingModule.View
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(321, 38);
             this.textBox1.TabIndex = 2;
-            this.textBox1.Text = "Choose the face to start the detailing module with the alphabet placement. Multip" +
-    "le selection is allowed.";
+            this.textBox1.Text = "Choose the solid body to start the detailing module with the alphabet placement.";
             // 
             // btnSelectFace
             // 
@@ -104,7 +103,7 @@ namespace DrawingDetailingModule.View
             this.btnSelectFace.Name = "btnSelectFace";
             this.btnSelectFace.Size = new System.Drawing.Size(230, 50);
             this.btnSelectFace.TabIndex = 0;
-            this.btnSelectFace.Text = "Select Face...";
+            this.btnSelectFace.Text = "Select Solid body..";
             this.btnSelectFace.UseVisualStyleBackColor = true;
             this.btnSelectFace.Click += new System.EventHandler(this.btnSelectFace_Click);
             // 

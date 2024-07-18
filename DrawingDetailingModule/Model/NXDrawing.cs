@@ -21,21 +21,19 @@ namespace DrawingDetailingModule.Model
         UFSession ufs;
         Control control;
 
-        HashSet<Point3d> pointOnFaceCollection;
-        Tag selectedFaceTag;
-        List<TaggedObject> selectedFaces;
+        List<TaggedObject> selectedBodys;
         List<Point3d> locatedPoint;
-        public List<TaggedObject> SelectedFaces
+        public List<TaggedObject> SelectedBodys
         {
-            get { return selectedFaces; }
-            set { selectedFaces = value; }
+            get { return selectedBodys; }
+            set { selectedBodys = value; }
         }
         public List<Point3d> LocatedPoint
         {
             get { return locatedPoint; }
             set { locatedPoint = value; }
         }
-        public bool IsFaceSelected => selectedFaces.Count > 0;
+        public bool IsFaceSelected => selectedBodys.Count > 0;
         public bool IsPointLocated => locatedPoint.Count > 0;
 
         public NXDrawing(Control control)
@@ -45,8 +43,7 @@ namespace DrawingDetailingModule.Model
             workPart = session.Parts.Work;
             ui = UI.GetUI();
 
-            pointOnFaceCollection = new HashSet<Point3d>();
-            selectedFaces = new List<TaggedObject>();
+            selectedBodys = new List<TaggedObject>();
             locatedPoint = new List<Point3d>();
 
             this.control = control;
@@ -69,13 +66,13 @@ namespace DrawingDetailingModule.Model
 
             var dimMask = new Selection.MaskTriple(NXOpen.UF.UFConstants.UF_solid_type, UFConstants.UF_solid_body_subtype, UFConstants.UF_UI_SEL_FEATURE_BODY);
             Selection.MaskTriple[] maskArray = new Selection.MaskTriple[] { dimMask };
-            //var response = selManager.SelectTaggedObjects(message, title, scope, action, includeFeature, keepHighlighted, maskArray, out selectedObjects);
-            var response = selManager.SelectTaggedObject(message, title, scope, action, includeFeature, keepHighlighted, maskArray,out selectedObject,out cursor);
+            var response = selManager.SelectTaggedObject(message, title, scope, action, includeFeature, keepHighlighted, maskArray, out selectedObject, out cursor);
 
             if (response == NXOpen.Selection.Response.Cancel && response == NXOpen.Selection.Response.Back)
             {
                 return null;
             }
+
             List<TaggedObject> result = new List<TaggedObject>();
             result.Add(selectedObject);
             return result;
@@ -214,7 +211,7 @@ namespace DrawingDetailingModule.Model
             PmiPreferencesBuilder pmiPreferencesBuilder;
             pmiPreferencesBuilder = workPart.PmiSettingsManager.CreatePreferencesBuilder();
             return pmiPreferencesBuilder.AnnotationStyle.LetteringStyle.GeneralTextSize;
-        }      
+        }
 
         public List<MachiningDescriptionModel> IterateFeatures()
         {
@@ -235,7 +232,7 @@ namespace DrawingDetailingModule.Model
                     List<Point3d> points = feat.GetLocation();
                     List<Point3d> outPoints = new List<Point3d>();
 
-                    if (IsPointContainInBoundingBox(points, selectedFaces[0].Tag, out outPoints))
+                    if (IsPointContainInBoundingBox(points, selectedBodys[0].Tag, out outPoints))
                     {
                         descriptionModels.Add(new MachiningDescriptionModel(description, outPoints.Count, outPoints));
                     }
@@ -249,6 +246,44 @@ namespace DrawingDetailingModule.Model
             return descriptionModels;
         }
 
+        private NXObject CreateBoundingBox(TaggedObject bodyTagObject)
+        {
+            NXOpen.Features.ToolingBoxBuilder toolingBoxBuilder;
+            toolingBoxBuilder = workPart.Features.ToolingFeatureCollection.CreateToolingBoxBuilder(null);
+
+            toolingBoxBuilder.Type = ToolingBoxBuilder.Types.BoundedBlock;
+            NXObject[] selections = new NXObject[1];
+            NXObject[] deselections = new NXObject[0];
+            selections[0] = bodyTagObject as NXObject;
+
+            System.Diagnostics.Debugger.Launch();
+            Body body = bodyTagObject as Body;
+            //Point3d location = extrude.Location;            
+
+            Matrix3x3 matrix = new Matrix3x3();
+            matrix.Xx = 1.0;
+            matrix.Xy = 0.0;
+            matrix.Xz = 0.0;
+            matrix.Yx = 0.0;
+            matrix.Yy = 1.0;
+            matrix.Yz = 0.0;
+            matrix.Zx = 0.0;
+            matrix.Zy = 0.0;
+            matrix.Zz = 1.0;
+            Point3d position = new Point3d(0.0, 0.0, 0.0);
+            toolingBoxBuilder.SetBoxMatrixAndPosition(matrix, position);
+
+            toolingBoxBuilder.SetSelectedOccurrences(selections, deselections);
+            toolingBoxBuilder.CalculateBoxSize();
+
+            NXObject boundingBoxObj = toolingBoxBuilder.Commit();
+            toolingBoxBuilder.Destroy();
+
+            return boundingBoxObj;
+        }
+
+
+
         private bool IsPointContainInBoundingBox(List<Point3d> points, Tag selectedFaceTag, out List<Point3d> outPoints)
         {
             const int INSIDE_BODY = 1;
@@ -259,13 +294,16 @@ namespace DrawingDetailingModule.Model
             List<Point3d> pointCollection = new List<Point3d>();
             
             int pt_status = 0;
-            AskBoundingBox boundingBox = new AskBoundingBox(ufs, SelectedFaces[0].Tag);
+            AskBoundingBox boundingBox = new AskBoundingBox(ufs, SelectedBodys[0].Tag);
+            NXObject boundingBoxObj = boundingBox.CreateBoundingBox();
+            Block block = boundingBoxObj as Block;
+            Body[] bodies = block.GetBodies();            
 
             foreach (Point3d p in points)
             {
                 double[] pt = new double[] { p.X, p.Y, p.Z };
-
-                ufs.Modl.AskPointContainment(pt, SelectedFaces[0].Tag, out pt_status);
+                
+                ufs.Modl.AskPointContainment(pt, bodies[0].Tag, out pt_status);
 
                 switch (pt_status)
                 {
@@ -281,7 +319,11 @@ namespace DrawingDetailingModule.Model
                         break;
                 }
             }
-            outPoints = boundingBox.VerifyPoints(pointCollection);            
+
+            outPoints = boundingBox.VerifyPoints(pointCollection);
+            Tag[] block_Tags = new Tag[] { block.Tag };
+            ufs.Modl.DeleteFeature(block_Tags);
+
             return result;
         }
 
