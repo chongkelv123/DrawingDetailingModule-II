@@ -91,6 +91,7 @@ namespace DrawingDetailingModule.Model
         {
             FeatureSigns sign = FeatureSigns.Nullsign;
             double[] corner_pt = new double[] { MinX, MinY, MinZ };
+            
 
             string[] edge_len = new string[] { "150.0", "550.0", "125.0" };
             Tag blk_obj;
