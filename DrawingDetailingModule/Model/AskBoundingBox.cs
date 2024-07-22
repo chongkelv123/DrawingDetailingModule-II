@@ -89,16 +89,47 @@ namespace DrawingDetailingModule.Model
 
         public NXObject CreateBoundingBox()
         {
+            //System.Diagnostics.Debugger.Launch();
             FeatureSigns sign = FeatureSigns.Nullsign;
             double[] corner_pt = new double[] { MinX, MinY, MinZ };
-            
 
-            string[] edge_len = new string[] { "150.0", "550.0", "125.0" };
+            string thickness = GetThickness();
+            string length = GetLength();
+            string width = GetWidth();
+
+            string[] edge_len = new string[] { thickness, length, width };
             Tag blk_obj;
             ufs.Modl.CreateBlock1(sign, corner_pt, edge_len, out blk_obj);
 
             NXObject result = NXOpen.Utilities.NXObjectManager.Get(blk_obj) as NXObject;
             return result;
+        }
+
+        private string GetWidth()
+        {
+            if (MaxY > 0)
+            {
+                return Math.Abs(MaxY).ToString();
+            }
+            return Math.Abs(MinY).ToString();
+        }
+
+        private string GetLength()
+        {
+            if(MaxX > 0)
+            {
+                return Math.Abs(MaxX).ToString();
+            }
+            return Math.Abs(MinX).ToString();
+        }
+
+        private string GetThickness()
+        {
+            if(MaxZ > 0)
+            {
+                return Math.Abs(MaxZ).ToString();
+            }
+            return Math.Abs(MinZ).ToString();
         }
     }
 }
