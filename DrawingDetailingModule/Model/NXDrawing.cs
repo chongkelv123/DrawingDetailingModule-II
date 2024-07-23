@@ -143,6 +143,8 @@ namespace DrawingDetailingModule.Model
             for (int i = 0; i < descriptionModels.Count; i++)
             {
                 ufs.Tabnot.AskNthRow(tabNote, i + 1, out row);
+
+                PlaceAnnotation(descriptionModels[i].Points, NumberToAlphabet(i));
                 for (int j = 0; j < numOfColumn; j++)
                 {
                     ufs.Tabnot.AskNthColumn(tabNote, j, out column);
@@ -164,6 +166,20 @@ namespace DrawingDetailingModule.Model
 
             pmiTableBuilder.Destroy();
             return table;
+        }
+
+        private void PlaceAnnotation(List<Point3d> points, string alphabet)
+        {
+            int num_lines_text = 1;
+            const int HORIZONTAL = 0;
+            const int VERTICAL = 1;
+            string[] text_string = new string[1];
+            text_string[0] = alphabet;
+            foreach (Point3d point in points)
+            {
+                double[] pt = new double[] { point.X, point.Y, point.Z };
+                ufs.Drf.CreateNote(num_lines_text, text_string, pt, HORIZONTAL, out _);
+            }
         }
 
         public string NumberToAlphabet(int number)
@@ -232,6 +248,7 @@ namespace DrawingDetailingModule.Model
                     List<Point3d> points = feat.GetLocation();
                     List<Point3d> outPoints = new List<Point3d>();
 
+                    
                     if (IsPointContainInBoundingBox(points, selectedBodys[0].Tag, out outPoints))
                     {
                         descriptionModels.Add(new MachiningDescriptionModel(description, outPoints.Count, outPoints));
@@ -244,7 +261,7 @@ namespace DrawingDetailingModule.Model
             }
 
             return descriptionModels;
-        }      
+        }
 
         private bool IsPointContainInBoundingBox(List<Point3d> points, Tag selectedFaceTag, out List<Point3d> outPoints)
         {
