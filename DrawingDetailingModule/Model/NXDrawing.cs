@@ -244,45 +244,7 @@ namespace DrawingDetailingModule.Model
             }
 
             return descriptionModels;
-        }
-
-        private NXObject CreateBoundingBox(TaggedObject bodyTagObject)
-        {
-            NXOpen.Features.ToolingBoxBuilder toolingBoxBuilder;
-            toolingBoxBuilder = workPart.Features.ToolingFeatureCollection.CreateToolingBoxBuilder(null);
-
-            toolingBoxBuilder.Type = ToolingBoxBuilder.Types.BoundedBlock;
-            NXObject[] selections = new NXObject[1];
-            NXObject[] deselections = new NXObject[0];
-            selections[0] = bodyTagObject as NXObject;
-
-            System.Diagnostics.Debugger.Launch();
-            Body body = bodyTagObject as Body;
-            //Point3d location = extrude.Location;            
-
-            Matrix3x3 matrix = new Matrix3x3();
-            matrix.Xx = 1.0;
-            matrix.Xy = 0.0;
-            matrix.Xz = 0.0;
-            matrix.Yx = 0.0;
-            matrix.Yy = 1.0;
-            matrix.Yz = 0.0;
-            matrix.Zx = 0.0;
-            matrix.Zy = 0.0;
-            matrix.Zz = 1.0;
-            Point3d position = new Point3d(0.0, 0.0, 0.0);
-            toolingBoxBuilder.SetBoxMatrixAndPosition(matrix, position);
-
-            toolingBoxBuilder.SetSelectedOccurrences(selections, deselections);
-            toolingBoxBuilder.CalculateBoxSize();
-
-            NXObject boundingBoxObj = toolingBoxBuilder.Commit();
-            toolingBoxBuilder.Destroy();
-
-            return boundingBoxObj;
-        }
-
-
+        }      
 
         private bool IsPointContainInBoundingBox(List<Point3d> points, Tag selectedFaceTag, out List<Point3d> outPoints)
         {
@@ -292,17 +254,17 @@ namespace DrawingDetailingModule.Model
 
             bool result = false;
             List<Point3d> pointCollection = new List<Point3d>();
-            
+
             int pt_status = 0;
             AskBoundingBox boundingBox = new AskBoundingBox(ufs, SelectedBodys[0].Tag);
             NXObject boundingBoxObj = boundingBox.CreateBoundingBox();
             Block block = boundingBoxObj as Block;
-            Body[] bodies = block.GetBodies();            
+            Body[] bodies = block.GetBodies();
 
             foreach (Point3d p in points)
             {
                 double[] pt = new double[] { p.X, p.Y, p.Z };
-                
+
                 ufs.Modl.AskPointContainment(pt, bodies[0].Tag, out pt_status);
 
                 switch (pt_status)
@@ -319,7 +281,7 @@ namespace DrawingDetailingModule.Model
                         break;
                 }
             }
-
+            //System.Diagnostics.Debugger.Launch();
             outPoints = boundingBox.VerifyPoints(pointCollection);
             Tag[] block_Tags = new Tag[] { block.Tag };
             ufs.Modl.DeleteFeature(block_Tags);
