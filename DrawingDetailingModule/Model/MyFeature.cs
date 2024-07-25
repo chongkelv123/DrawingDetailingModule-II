@@ -27,6 +27,10 @@ namespace DrawingDetailingModule.Model
             GetPointsFromEdges(feature);
         }
 
+        protected MyFeature()
+        {
+        }
+
         public abstract void GetFeatureDetailInformation(HolePackage holePackage);
 
         public abstract string GetProcessAbbrevate();

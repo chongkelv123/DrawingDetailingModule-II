@@ -17,6 +17,8 @@ namespace DrawingDetailingModule.Model
         {
         }
 
+        public Counterbore2() { }
+
         private bool AskThruHole(HolePackage hole)
         {
             int edit = 0;

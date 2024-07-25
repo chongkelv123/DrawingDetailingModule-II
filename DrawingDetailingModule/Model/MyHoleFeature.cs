@@ -11,14 +11,18 @@ using NXOpen.UF;
 namespace DrawingDetailingModule.Model
 {
     public abstract class MyHoleFeature : MyFeature
-    {        
+    {
         public double HoleDiameter { get; set; }
-        public double HoleDepth { get; set; }        
-        public bool IsThruHole { get; set; }        
+        public double HoleDepth { get; set; }
+        public double TipAngle { get; set; }
+        public bool IsThruHole { get; set; }
 
-        protected MyHoleFeature(Feature feature):base(feature)
-        {            
-        }                                
-    
+        protected MyHoleFeature(Feature feature) : base(feature)
+        {
+        }
+
+        protected MyHoleFeature()
+        {
+        }
     }
 }

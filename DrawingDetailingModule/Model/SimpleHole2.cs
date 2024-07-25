@@ -15,16 +15,30 @@ namespace DrawingDetailingModule.Model
         public SimpleHole2(HolePackage hole) : base (hole)
         {
         }
+
+        string processAbbrevate;
         public override string GetProcessAbbrevate() => "DR";
         
         public override void GetFeatureDetailInformation(HolePackage hole)
         {
+            //System.Diagnostics.Debugger.Launch();
             HolePackageBuilder hpBuilder = workPart.Features.CreateHolePackageBuilder(hole);
             HoleDiameter = hpBuilder.ScrewClearanceHoleDiameter.Value;
             HoleDepth = hpBuilder.ScrewClearanceHoleDepth.Value;
+            TipAngle = hpBuilder.GeneralTipAngle.Value;
             Quantity = points.Count;
 
             IsThruHole = AskThruHole(hole);
+
+            if(TipAngle == 0 && IsThruHole == false)
+            {
+                Counterbore2 counterbore = new Counterbore2();
+                processAbbrevate = counterbore.GetProcessAbbrevate();
+            }
+            else
+            {
+                processAbbrevate = GetProcessAbbrevate();
+            }            
         }
 
         private bool AskThruHole(HolePackage hole)
@@ -43,7 +57,7 @@ namespace DrawingDetailingModule.Model
         public override string ToString()
         {
             string depth = IsThruHole ? "THRU" : $"{HoleDepth:F1}";
-            string result = $"{GetProcessAbbrevate()} <o>{HoleDiameter:F1} {depth}";
+            string result = $"{processAbbrevate} <o>{HoleDiameter:F1} DP {depth}";
 
             return result;
         }
