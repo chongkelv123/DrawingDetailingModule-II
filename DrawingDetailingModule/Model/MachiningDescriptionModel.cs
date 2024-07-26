@@ -9,10 +9,10 @@ namespace DrawingDetailingModule.Model
 {
     public class MachiningDescriptionModel
     {
-        public string Description {get; set;}
-        public int  Quantity { get; set; }
+        public string Description { get; set; }
+        public int Quantity { get; set; }
         public List<Point3d> Points { get; set; }
-        
+
         public MachiningDescriptionModel()
         {
         }
@@ -24,9 +24,38 @@ namespace DrawingDetailingModule.Model
             Points = points;
         }
 
-        public static bool IsDescriptionSame(MachiningDescriptionModel model1, MachiningDescriptionModel model2)
+        public static bool IsDescriptionSame(List<MachiningDescriptionModel> models, MachiningDescriptionModel targetModel)
         {
-            return model1.Description.Equals(model2.Description, StringComparison.OrdinalIgnoreCase);
+            foreach (MachiningDescriptionModel model in models)
+            {
+                if (model.Description.Equals(targetModel.Description, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static void SumUpModelQuantity(List<MachiningDescriptionModel> models, MachiningDescriptionModel targetModel)
+        {
+            foreach (MachiningDescriptionModel model in models)
+            {
+                if (model.Description.Equals(targetModel.Description, StringComparison.OrdinalIgnoreCase))
+                {
+                    model.Quantity = targetModel.Quantity + model.Quantity;
+                }
+            }
+        }
+
+        public static void AppendModelPoints(List<MachiningDescriptionModel> models, MachiningDescriptionModel targetModel)
+        {
+            foreach (MachiningDescriptionModel model in models)
+            {
+                if (model.Description.Equals(targetModel.Description, StringComparison.OrdinalIgnoreCase))
+                {
+                    targetModel.Points.ForEach(x => model.Points.Add(x));
+                }
+            }
         }
     }
 }

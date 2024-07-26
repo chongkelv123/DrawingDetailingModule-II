@@ -142,7 +142,7 @@ namespace DrawingDetailingModule.Model
             int numOfColumn = 3;
             int numOfSkipAlp = 0;
             int tempInt = 0;
-            System.Diagnostics.Debugger.Launch();
+            
             for (int i = 0; i < descriptionModels.Count; i++)
             {
                 ufs.Tabnot.AskNthRow(tabNote, i + 1, out row);
@@ -237,8 +237,8 @@ namespace DrawingDetailingModule.Model
             var featureCollection = workPart.Features;
             FeatureFactory factory = new FeatureFactory();
 
-            List<MachiningDescriptionModel> descriptionModels = new List<MachiningDescriptionModel>();
-
+            List<MachiningDescriptionModel> descModels = new List<MachiningDescriptionModel>();
+            MachiningDescriptionModel descModel;
             foreach (Feature feature in featureCollection)
             {
                 if (feature.GetType() == typeof(NXOpen.Features.HolePackage))
@@ -255,7 +255,16 @@ namespace DrawingDetailingModule.Model
                     {
                         continue;
                     }
-                    descriptionModels.Add(new MachiningDescriptionModel(description, outPoints.Count, outPoints));
+                    descModel = new MachiningDescriptionModel(description, outPoints.Count, outPoints);
+                    if(MachiningDescriptionModel.IsDescriptionSame(descModels, descModel))
+                    {
+                        MachiningDescriptionModel.SumUpModelQuantity(descModels, descModel);
+                        MachiningDescriptionModel.AppendModelPoints(descModels, descModel);
+                    }
+                    else
+                    {
+                        descModels.Add(descModel);
+                    }                    
                 }
                 else if (feature.GetType() == typeof(NXOpen.Features.Extrude))
                 {
@@ -263,7 +272,7 @@ namespace DrawingDetailingModule.Model
                 }
             }
 
-            return descriptionModels;
+            return descModels;
         }
 
         private bool IsPointContainInBoundingBox(List<Point3d> points, Tag selectedFaceTag, out List<Point3d> outPoints)
@@ -301,7 +310,7 @@ namespace DrawingDetailingModule.Model
                         break;
                 }
             }
-            //System.Diagnostics.Debugger.Launch();
+            
             outPoints = boundingBox.VerifyPoints(pointCollection);
             Tag[] block_Tags = new Tag[] { block.Tag };
             ufs.Modl.DeleteFeature(block_Tags);
