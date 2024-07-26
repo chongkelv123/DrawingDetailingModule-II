@@ -23,5 +23,10 @@ namespace DrawingDetailingModule.Model
             Quantity = quantity;
             Points = points;
         }
+
+        public static bool IsDescriptionSame(MachiningDescriptionModel model1, MachiningDescriptionModel model2)
+        {
+            return model1.Description.Equals(model2.Description, StringComparison.OrdinalIgnoreCase);
+        }
     }
 }

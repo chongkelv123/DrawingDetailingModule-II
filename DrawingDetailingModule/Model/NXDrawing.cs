@@ -170,16 +170,35 @@ namespace DrawingDetailingModule.Model
 
         private void PlaceAnnotation(List<Point3d> points, string alphabet)
         {
+            //System.Diagnostics.Debugger.Launch();
             int num_lines_text = 1;
+            const int BLUE = 5;
             const int HORIZONTAL = 0;
             const int VERTICAL = 1;
             string[] text_string = new string[1];
             text_string[0] = alphabet;
+            Tag note_tag = Tag.Null;
             foreach (Point3d point in points)
             {
-                double[] pt = new double[] { point.X, point.Y, point.Z };
-                ufs.Drf.CreateNote(num_lines_text, text_string, pt, HORIZONTAL, out _);
+                //double[] pt = new double[] { point.X, point.Y, point.Z };
+                //ufs.Drf.CreateNote(num_lines_text, text_string, pt, HORIZONTAL, out note_tag);
+
+                AnnotationManager manager = workPart.Annotations;
+                Note note = manager.CreateNote(text_string, point, AxisOrientation.Horizontal, null, null);
+
+                //Note note = NXOpen.Utilities.NXObjectManager.Get(note_tag) as Note;
+                //PmiNoteBuilder noteBuilder = workPart.Annotations.CreatePmiNoteBuilder(note);
+
+                //LetteringPreferences letteringPrefs = note.GetLetteringPreferences();
+                //Lettering generalText = letteringPrefs.GetGeneralText();
+                //generalText.Size = 5;
+                //letteringPrefs.SetGeneralText(generalText);
+
+                //note.SetLetteringPreferences(letteringPrefs);
+
             }
+
+
         }
 
         public string NumberToAlphabet(int number)
@@ -248,11 +267,11 @@ namespace DrawingDetailingModule.Model
                     List<Point3d> points = feat.GetLocation();
                     List<Point3d> outPoints = new List<Point3d>();
 
-                    
-                    if (IsPointContainInBoundingBox(points, selectedBodys[0].Tag, out outPoints))
+                    if (!IsPointContainInBoundingBox(points, selectedBodys[0].Tag, out outPoints))
                     {
-                        descriptionModels.Add(new MachiningDescriptionModel(description, outPoints.Count, outPoints));
+                        continue;
                     }
+                    descriptionModels.Add(new MachiningDescriptionModel(description, outPoints.Count, outPoints));
                 }
                 else if (feature.GetType() == typeof(NXOpen.Features.Extrude))
                 {
