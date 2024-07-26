@@ -140,18 +140,25 @@ namespace DrawingDetailingModule.Model
             ufs.Tabnot.SetColumnWidth(column, 60);
 
             int numOfColumn = 3;
+            int numOfSkipAlp = 0;
+            int tempInt = 0;
+            System.Diagnostics.Debugger.Launch();
             for (int i = 0; i < descriptionModels.Count; i++)
             {
                 ufs.Tabnot.AskNthRow(tabNote, i + 1, out row);
 
-                PlaceAnnotation(descriptionModels[i].Points, NumberToAlphabet(i));
+                PlaceAnnotation(descriptionModels[i].Points, NumberToAlphabet(i + numOfSkipAlp, out tempInt));
+                if(tempInt > 0)
+                {
+                    numOfSkipAlp = tempInt;
+                }
                 for (int j = 0; j < numOfColumn; j++)
                 {
                     ufs.Tabnot.AskNthColumn(tabNote, j, out column);
                     ufs.Tabnot.AskCellAtRowCol(row, column, out cell);
                     if (j == 0)
                     {
-                        ufs.Tabnot.SetCellText(cell, NumberToAlphabet(i));
+                        ufs.Tabnot.SetCellText(cell, NumberToAlphabet(i + numOfSkipAlp, out tempInt));
                     }
                     else if (j == 1)
                     {
@@ -169,53 +176,30 @@ namespace DrawingDetailingModule.Model
         }
 
         private void PlaceAnnotation(List<Point3d> points, string alphabet)
-        {
-            //System.Diagnostics.Debugger.Launch();
-            int num_lines_text = 1;
-            const int BLUE = 5;
-            const int HORIZONTAL = 0;
-            const int VERTICAL = 1;
+        {               
             string[] text_string = new string[1];
             text_string[0] = alphabet;
-            Tag note_tag = Tag.Null;
+
             foreach (Point3d point in points)
             {
-                //double[] pt = new double[] { point.X, point.Y, point.Z };
-                //ufs.Drf.CreateNote(num_lines_text, text_string, pt, HORIZONTAL, out note_tag);
-
                 AnnotationManager manager = workPart.Annotations;
                 Note note = manager.CreateNote(text_string, point, AxisOrientation.Horizontal, null, null);
-
-                //Note note = NXOpen.Utilities.NXObjectManager.Get(note_tag) as Note;
-                //PmiNoteBuilder noteBuilder = workPart.Annotations.CreatePmiNoteBuilder(note);
-
-                //LetteringPreferences letteringPrefs = note.GetLetteringPreferences();
-                //Lettering generalText = letteringPrefs.GetGeneralText();
-                //generalText.Size = 5;
-                //letteringPrefs.SetGeneralText(generalText);
-
-                //note.SetLetteringPreferences(letteringPrefs);
-
             }
-
-
         }
 
-        public string NumberToAlphabet(int number)
+        public string NumberToAlphabet(int number, out int numberOfSkipAlphabet)
         {
             int asciiDec = 65;
+            numberOfSkipAlphabet = 0;
             char c;
             StringBuilder stringBuilder = new StringBuilder();
 
             asciiDec += number;
-            if (asciiDec == 73)
+            if (asciiDec == 73 || asciiDec == 79) // Skip alphabet I or Skip alphabet O
             {
-                asciiDec++;
-            }
-            else if (asciiDec == 79)
-            {
-                asciiDec++;
-            }
+                numberOfSkipAlphabet++;
+                asciiDec += numberOfSkipAlphabet;
+            }            
 
             if (asciiDec <= 90)
             {
