@@ -27,11 +27,13 @@ namespace DrawingDetailingModule.Model
             GetPointsFromEdges(feature);
         }
 
-        protected MyFeature()
+        public MyFeature()
         {
         }
 
-        public abstract void GetFeatureDetailInformation(HolePackage holePackage);
+        //public abstract void GetFeatureDetailInformation(HolePackage holePackage);
+        public abstract void GetFeatureDetailInformation(Feature feature);
+        //public abstract void GetFeatureDetailInformation(Extrude extrude);
 
         public abstract string GetProcessAbbrevate();
 

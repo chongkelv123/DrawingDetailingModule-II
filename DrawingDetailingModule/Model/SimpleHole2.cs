@@ -19,16 +19,38 @@ namespace DrawingDetailingModule.Model
         string processAbbrevate;
         public override string GetProcessAbbrevate() => "DR";
 
-        public override void GetFeatureDetailInformation(HolePackage hole)
+        //public override void GetFeatureDetailInformation(HolePackage hole)
+        //{
+        //    //System.Diagnostics.Debugger.Launch();
+        //    HolePackageBuilder hpBuilder = workPart.Features.CreateHolePackageBuilder(hole);
+        //    HoleDiameter = hpBuilder.ScrewClearanceHoleDiameter.Value;
+        //    HoleDepth = hpBuilder.ScrewClearanceHoleDepth.Value;
+        //    TipAngle = hpBuilder.GeneralTipAngle.Value;
+        //    Quantity = points.Count;
+
+        //    IsThruHole = AskThruHole(hole);
+
+        //    if (TipAngle == 0 && IsThruHole == false)
+        //    {
+        //        Counterbore2 counterbore = new Counterbore2();
+        //        processAbbrevate = counterbore.GetProcessAbbrevate();
+        //    }
+        //    else
+        //    {
+        //        processAbbrevate = GetProcessAbbrevate();
+        //    }
+        //}
+        
+        public override void GetFeatureDetailInformation(Feature feature)
         {
-            //System.Diagnostics.Debugger.Launch();
-            HolePackageBuilder hpBuilder = workPart.Features.CreateHolePackageBuilder(hole);
+            HolePackage holePackage = feature as HolePackage;
+            HolePackageBuilder hpBuilder = workPart.Features.CreateHolePackageBuilder(holePackage);
             HoleDiameter = hpBuilder.ScrewClearanceHoleDiameter.Value;
             HoleDepth = hpBuilder.ScrewClearanceHoleDepth.Value;
             TipAngle = hpBuilder.GeneralTipAngle.Value;
             Quantity = points.Count;
 
-            IsThruHole = AskThruHole(hole);
+            IsThruHole = AskThruHole(holePackage);
 
             if (TipAngle == 0 && IsThruHole == false)
             {

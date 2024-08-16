@@ -27,8 +27,9 @@ namespace DrawingDetailingModule.Model
         public override string GetProcessAbbrevate() => "TAP";
         
 
-        public override void GetFeatureDetailInformation(HolePackage holePackage)
+        public override void GetFeatureDetailInformation(Feature feature)
         {
+            HolePackage holePackage = feature as HolePackage;
             HolePackageBuilder hpBuilder = workPart.Features.CreateHolePackageBuilder(holePackage);
             ThreadSide = hpBuilder.ThreadSize;
             ThreadDepth = hpBuilder.ThreadDepth.Value;

@@ -10,7 +10,7 @@ namespace DrawingDetailingModule.Model
     interface IFeature
     {        
         string GetProcessAbbrevate();
-        void GetFeatureDetailInformation(HolePackage holePackage);
+        void GetFeatureDetailInformation(Feature feature);
 
     }
 }

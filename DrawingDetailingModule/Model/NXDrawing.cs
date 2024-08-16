@@ -243,20 +243,8 @@ namespace DrawingDetailingModule.Model
             {
                 if (feature.GetType() == typeof(NXOpen.Features.HolePackage))
                 {
-                    NXOpen.Features.HolePackage holePackage = feature as NXOpen.Features.HolePackage;
-                    MyFeature feat = factory.GetFeature(feature);
-                    feat.GetFeatureDetailInformation(holePackage);
-                    string description = feat.ToString();
-
-                    List<Point3d> points = feat.GetLocation();
-                    List<Point3d> outPoints = new List<Point3d>();
-
-                    if (!IsPointContainInBoundingBox(points, selectedBodys[0].Tag, out outPoints))
-                    {
-                        continue;
-                    }
-                    descModel = new MachiningDescriptionModel(description, outPoints.Count, outPoints);
-                    if(MachiningDescriptionModel.IsDescriptionSame(descModels, descModel))
+                    descModel = ProcessHolePackage(factory, feature);
+                    if (MachiningDescriptionModel.IsDescriptionSame(descModels, descModel))
                     {
                         MachiningDescriptionModel.SumUpModelQuantity(descModels, descModel);
                         MachiningDescriptionModel.AppendModelPoints(descModels, descModel);
@@ -264,15 +252,48 @@ namespace DrawingDetailingModule.Model
                     else
                     {
                         descModels.Add(descModel);
-                    }                    
+                    }
                 }
                 else if (feature.GetType() == typeof(NXOpen.Features.Extrude))
-                {
-                    NXOpen.Features.Extrude extrude = feature as NXOpen.Features.Extrude;
+                {                    
+                    //descModel = ProcessExtrudeFeat(factory, feature);
                 }
             }
 
             return descModels;
+        }
+
+        private MachiningDescriptionModel ProcessExtrudeFeat(FeatureFactory factory, Feature feature)
+        {
+            MachiningDescriptionModel descModel;
+            NXOpen.Features.Extrude extrude = feature as NXOpen.Features.Extrude;
+            MyFeature feat = factory.GetFeature(feature);
+            feat.GetFeatureDetailInformation(extrude);
+            string description = feat.ToString();
+
+            descModel = null;
+
+            return descModel;
+        }
+
+        private MachiningDescriptionModel ProcessHolePackage(FeatureFactory factory, Feature feature)
+        {
+            MachiningDescriptionModel descModel;
+            NXOpen.Features.HolePackage holePackage = feature as NXOpen.Features.HolePackage;
+            MyFeature feat = factory.GetFeature(feature);
+            feat.GetFeatureDetailInformation(feature);
+            string description = feat.ToString();
+
+            List<Point3d> points = feat.GetLocation();
+            List<Point3d> outPoints = new List<Point3d>();
+
+            if (!IsPointContainInBoundingBox(points, selectedBodys[0].Tag, out outPoints))
+            {
+                return null;
+            }
+            descModel = new MachiningDescriptionModel(description, outPoints.Count, outPoints);
+            
+            return descModel;
         }
 
         private bool IsPointContainInBoundingBox(List<Point3d> points, Tag selectedFaceTag, out List<Point3d> outPoints)

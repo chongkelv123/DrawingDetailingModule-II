@@ -45,8 +45,9 @@ namespace DrawingDetailingModule.Model
 
         public override string GetProcessAbbrevate() => "C'BORE";
 
-        public override void GetFeatureDetailInformation(HolePackage holePackage)
+        public override void GetFeatureDetailInformation(Feature feature)
         {
+            HolePackage holePackage = feature as HolePackage;
             HolePackageBuilder hpBuilder = workPart.Features.CreateHolePackageBuilder(holePackage);
             CounterboreDiamter = hpBuilder.ScrewClearanceCounterboreDiameter.Value;
             HoleDiameter = hpBuilder.ScrewClearanceHoleDiameter.Value;
