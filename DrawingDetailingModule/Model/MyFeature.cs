@@ -30,21 +30,25 @@ namespace DrawingDetailingModule.Model
         public MyFeature()
         {
         }
-
-        //public abstract void GetFeatureDetailInformation(HolePackage holePackage);
-        public abstract void GetFeatureDetailInformation(Feature feature);
-        //public abstract void GetFeatureDetailInformation(Extrude extrude);
+        
+        public abstract void GetFeatureDetailInformation(Feature feature);        
 
         public abstract string GetProcessAbbrevate();
 
         public void GetPointsFromEdges(Feature feature)
         {
-            Edge[] edges = feature.GetEdges();
+            System.Diagnostics.Debugger.Launch();
+            Edge[] edges = feature.GetEdges();            
             var circularEdges = edges
-                .Where(edge => edge.SolidEdgeType == Edge.EdgeType.Circular)
+                .Where(edge => edge.SolidEdgeType == Edge.EdgeType.Circular)                
                 .Select(edge => edge.GetLocations()[0].Location);
 
             circularEdges.ToList().ForEach(x => points.Add(new Point3d(x.X, x.Y, x.Z)));
+
+            // Test
+            HolePackage holePackage = feature as HolePackage;
+            Point3d[] origins;
+            holePackage.GetOrigins(out origins);
         }
 
         public static string GetProcessType(Feature feature)

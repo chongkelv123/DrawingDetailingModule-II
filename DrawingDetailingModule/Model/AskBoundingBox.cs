@@ -47,10 +47,12 @@ namespace DrawingDetailingModule.Model
             set { boundingBox[5] = value; }
         }
         public AskBoundingBox(UFSession ufs, Tag boundingBoxTag)
-        {
+        {            
             this.ufs = ufs;
             this.ufs.Modl.AskBoundingBox(boundingBoxTag, boundingBox);
         }
+
+        public AskBoundingBox() { }
 
         public bool IsFromTopDirection(double ptZ)
         {
@@ -96,7 +98,6 @@ namespace DrawingDetailingModule.Model
 
         public NXObject CreateBoundingBox()
         {
-
             FeatureSigns sign = FeatureSigns.Nullsign;
             double[] corner_pt = new double[] { MinX, MinY, MinZ };
 

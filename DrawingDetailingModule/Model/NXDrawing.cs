@@ -233,7 +233,7 @@ namespace DrawingDetailingModule.Model
         }
 
         public List<MachiningDescriptionModel> IterateFeatures()
-        {
+        {               
             var featureCollection = workPart.Features;
             FeatureFactory factory = new FeatureFactory();
 
@@ -264,7 +264,7 @@ namespace DrawingDetailingModule.Model
         }
 
         private MachiningDescriptionModel ProcessExtrudeFeat(FeatureFactory factory, Feature feature)
-        {
+        {            
             MachiningDescriptionModel descModel;
             NXOpen.Features.Extrude extrude = feature as NXOpen.Features.Extrude;
             MyFeature feat = factory.GetFeature(feature);
@@ -277,7 +277,7 @@ namespace DrawingDetailingModule.Model
         }
 
         private MachiningDescriptionModel ProcessHolePackage(FeatureFactory factory, Feature feature)
-        {
+        {            
             MachiningDescriptionModel descModel;
             NXOpen.Features.HolePackage holePackage = feature as NXOpen.Features.HolePackage;
             MyFeature feat = factory.GetFeature(feature);
@@ -302,6 +302,7 @@ namespace DrawingDetailingModule.Model
             const int OUTSIDE_BODY = 2;
             const int ON_BODY = 3;
 
+            System.Diagnostics.Debugger.Launch();
             bool result = false;
             List<Point3d> pointCollection = new List<Point3d>();
 
@@ -310,6 +311,8 @@ namespace DrawingDetailingModule.Model
             NXObject boundingBoxObj = boundingBox.CreateBoundingBox();
             Block block = boundingBoxObj as Block;
             Body[] bodies = block.GetBodies();
+
+            points.Sort((p1, p2) => p1.Z.CompareTo(p2.Z));
 
             foreach (Point3d p in points)
             {
