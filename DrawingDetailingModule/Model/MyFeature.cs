@@ -24,31 +24,31 @@ namespace DrawingDetailingModule.Model
             points = new List<Point3d>();
             ufs = UFSession.GetUFSession();
 
-            GetPointsFromEdges(feature);
+            GetCenterPoints(feature);
         }
 
         public MyFeature()
         {
         }
-        
-        public abstract void GetFeatureDetailInformation(Feature feature);        
+
+        public abstract void GetFeatureDetailInformation(Feature feature);
 
         public abstract string GetProcessAbbrevate();
 
-        public void GetPointsFromEdges(Feature feature)
+        public void GetCenterPoints(Feature feature)
         {
-            System.Diagnostics.Debugger.Launch();
-            Edge[] edges = feature.GetEdges();            
-            var circularEdges = edges
-                .Where(edge => edge.SolidEdgeType == Edge.EdgeType.Circular)                
-                .Select(edge => edge.GetLocations()[0].Location);
+            //System.Diagnostics.Debugger.Launch();
+            //Edge[] edges = feature.GetEdges();            
+            //var circularEdges = edges
+            //    .Where(edge => edge.SolidEdgeType == Edge.EdgeType.Circular)                
+            //    .Select(edge => edge.GetLocations()[0].Location);
 
-            circularEdges.ToList().ForEach(x => points.Add(new Point3d(x.X, x.Y, x.Z)));
+            //circularEdges.ToList().ForEach(x => points.Add(new Point3d(x.X, x.Y, x.Z)));
 
-            // Test
             HolePackage holePackage = feature as HolePackage;
             Point3d[] origins;
             holePackage.GetOrigins(out origins);
+            origins.ToList().ForEach(x => points.Add(new Point3d(x.X, x.Y, x.Z)));
         }
 
         public static string GetProcessType(Feature feature)

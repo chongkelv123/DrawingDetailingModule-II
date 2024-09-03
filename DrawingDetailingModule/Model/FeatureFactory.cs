@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NXOpen;
+using NXOpen.CAM;
 using NXOpen.Features;
 
 namespace DrawingDetailingModule.Model
@@ -11,6 +12,7 @@ namespace DrawingDetailingModule.Model
     public class FeatureFactory
     {
         public const string THREADED = "THREADED";
+        public const string DRILL = "DRILL";
         public const string COUNTERBORED = "COUNTERBORED";
         public const string SIMPLE = "SIMPLE";
         public const string MACHINING = "Machining";
@@ -38,6 +40,7 @@ namespace DrawingDetailingModule.Model
             AttributeIterator iterator = part.CreateAttributeIterator();
             iterator.SetIncludeOnlyTitle(TYPE);
             string type;
+            
             switch (processType)
             {
                 case THREADED:
@@ -57,6 +60,8 @@ namespace DrawingDetailingModule.Model
                     }
 
                     return new WCSimpleHole(holePackage);
+                case DRILL:
+                    return new SimpleHole2(holePackage);                    
                 default:
                     return null;
             }

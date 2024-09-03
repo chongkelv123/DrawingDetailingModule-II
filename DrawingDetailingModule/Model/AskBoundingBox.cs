@@ -79,22 +79,22 @@ namespace DrawingDetailingModule.Model
             return (MaxY == ptY);
         }
 
-        public List<Point3d> VerifyPoints(List<Point3d> pointCollection)
-        {
-            List<Point3d> outPoints = new List<Point3d>();
-            HashSet<Point2d> tempPoints = new HashSet<Point2d>();
-            double zValue = -1;
-            foreach (Point3d p in pointCollection)
-            {
-                tempPoints.Add(new Point2d(p.X, p.Y));
-                if (zValue == -1)
-                {
-                    zValue = p.Z;
-                }
-            }
-            tempPoints.ToList().ForEach(x => outPoints.Add(new Point3d(x.X, x.Y, zValue)));
-            return outPoints;
-        }
+        //public List<Point3d> VerifyPoints(List<Point3d> pointCollection)
+        //{
+        //    List<Point3d> outPoints = new List<Point3d>();
+        //    HashSet<Point2d> tempPoints = new HashSet<Point2d>();
+        //    double zValue = -1;
+        //    foreach (Point3d p in pointCollection)
+        //    {
+        //        tempPoints.Add(new Point2d(p.X, p.Y));
+        //        if (zValue == -1)
+        //        {
+        //            zValue = p.Z;
+        //        }
+        //    }
+        //    tempPoints.ToList().ForEach(x => outPoints.Add(new Point3d(x.X, x.Y, zValue)));
+        //    return outPoints;
+        //}
 
         public NXObject CreateBoundingBox()
         {

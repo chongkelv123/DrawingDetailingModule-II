@@ -301,8 +301,7 @@ namespace DrawingDetailingModule.Model
             const int INSIDE_BODY = 1;
             const int OUTSIDE_BODY = 2;
             const int ON_BODY = 3;
-
-            System.Diagnostics.Debugger.Launch();
+            
             bool result = false;
             List<Point3d> pointCollection = new List<Point3d>();
 
@@ -334,8 +333,9 @@ namespace DrawingDetailingModule.Model
                         break;
                 }
             }
-            
-            outPoints = boundingBox.VerifyPoints(pointCollection);
+
+            //outPoints = boundingBox.VerifyPoints(pointCollection);
+            outPoints = pointCollection;
             Tag[] block_Tags = new Tag[] { block.Tag };
             ufs.Modl.DeleteFeature(block_Tags);
 
