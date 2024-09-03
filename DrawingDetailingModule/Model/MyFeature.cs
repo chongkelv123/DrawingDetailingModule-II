@@ -36,15 +36,7 @@ namespace DrawingDetailingModule.Model
         public abstract string GetProcessAbbrevate();
 
         public void GetCenterPoints(Feature feature)
-        {
-            //System.Diagnostics.Debugger.Launch();
-            //Edge[] edges = feature.GetEdges();            
-            //var circularEdges = edges
-            //    .Where(edge => edge.SolidEdgeType == Edge.EdgeType.Circular)                
-            //    .Select(edge => edge.GetLocations()[0].Location);
-
-            //circularEdges.ToList().ForEach(x => points.Add(new Point3d(x.X, x.Y, x.Z)));
-
+        {            
             HolePackage holePackage = feature as HolePackage;
             Point3d[] origins;
             holePackage.GetOrigins(out origins);

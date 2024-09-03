@@ -332,9 +332,7 @@ namespace DrawingDetailingModule.Model
                     default:
                         break;
                 }
-            }
-
-            //outPoints = boundingBox.VerifyPoints(pointCollection);
+            }            
             outPoints = pointCollection;
             Tag[] block_Tags = new Tag[] { block.Tag };
             ufs.Modl.DeleteFeature(block_Tags);
