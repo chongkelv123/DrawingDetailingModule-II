@@ -261,7 +261,7 @@ namespace DrawingDetailingModule.Model
             }
 
             return descModels;
-        }
+        }        
 
         private MachiningDescriptionModel ProcessExtrudeFeat(FeatureFactory factory, Feature feature)
         {            
@@ -287,11 +287,12 @@ namespace DrawingDetailingModule.Model
             List<Point3d> points = feat.GetLocation();
             List<Point3d> outPoints = new List<Point3d>();
 
-            if (!IsPointContainInBoundingBox(points, selectedBodys[0].Tag, out outPoints))
-            {
-                return null;
-            }
-            descModel = new MachiningDescriptionModel(description, outPoints.Count, outPoints);
+            //if (!IsPointContainInBoundingBox(points, selectedBodys[0].Tag, out outPoints))
+            //{
+            //    return null;
+            //}
+
+            descModel = new MachiningDescriptionModel(description, points.Count, points);
             
             return descModel;
         }

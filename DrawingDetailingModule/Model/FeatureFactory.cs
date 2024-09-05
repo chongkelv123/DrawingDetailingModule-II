@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -39,8 +40,7 @@ namespace DrawingDetailingModule.Model
             Part part = Session.GetSession().Parts.Work;
             AttributeIterator iterator = part.CreateAttributeIterator();
             iterator.SetIncludeOnlyTitle(TYPE);
-            string type;
-            
+
             switch (processType)
             {
                 case THREADED:
@@ -48,24 +48,33 @@ namespace DrawingDetailingModule.Model
                 case COUNTERBORED:                    
                     return CounterBoreClassification(feature, iterator);
                 case SIMPLE:
-                    if (!feature.HasUserAttribute(iterator))
-                    {
-                        return new SimpleHole2(holePackage);
-                    }
-
-                    type = feature.GetStringUserAttribute(TYPE, 0);
-                    if (type.Equals(REAM, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return new ReamSimpleHole(holePackage);
-                    }
-
-                    return new WCSimpleHole(holePackage);
+                    return SimpleHoleClassification(feature, iterator);
                 case DRILL:
-                    return new SimpleHole2(holePackage);                    
+                    return new SimpleHole2(holePackage);
                 default:
-                    return null;
+                    throw new ArgumentNullException($"Error on: {processType}");
             }
 
+        }
+
+        private static MyFeature SimpleHoleClassification(Feature feature, AttributeIterator iterator)
+        {
+            HolePackage holePackage = feature as HolePackage;
+            string type;
+            
+            if (!feature.HasUserAttribute(iterator))
+            {
+                return new SimpleHole2(holePackage);
+            }
+
+            type = feature.GetStringUserAttribute(TYPE, 0);
+
+            if (type.Equals(REAM, StringComparison.OrdinalIgnoreCase))
+            {
+                return new ReamSimpleHole(holePackage);
+            }
+
+            return new WCSimpleHole(holePackage);
         }
 
         private MyFeature CounterBoreClassification(Feature feature, AttributeIterator iterator)
