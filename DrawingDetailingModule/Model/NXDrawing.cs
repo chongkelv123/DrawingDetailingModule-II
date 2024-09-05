@@ -285,12 +285,7 @@ namespace DrawingDetailingModule.Model
             string description = feat.ToString();
 
             List<Point3d> points = feat.GetLocation();
-            List<Point3d> outPoints = new List<Point3d>();
-
-            //if (!IsPointContainInBoundingBox(points, selectedBodys[0].Tag, out outPoints))
-            //{
-            //    return null;
-            //}
+            List<Point3d> outPoints = new List<Point3d>();       
 
             descModel = new MachiningDescriptionModel(description, points.Count, points);
             
