@@ -96,7 +96,7 @@ namespace DrawingDetailingModule.Model
             return result;
         }
 
-        private string GetLength()
+        public string GetLength()
         {
             if (IsEqualZero(precision, MaxX))
             {
@@ -113,7 +113,7 @@ namespace DrawingDetailingModule.Model
             return Math.Abs(MinX).ToString();
         }
 
-        private string GetWidth()
+        public string GetWidth()
         {
             if (IsEqualZero(precision, MaxY))
             {
@@ -130,7 +130,7 @@ namespace DrawingDetailingModule.Model
             return Math.Abs(MinY).ToString();
         }
 
-        private string GetThickness()
+        public string GetThickness()
         {
             if (IsEqualZero(precision, MaxZ))
             {
