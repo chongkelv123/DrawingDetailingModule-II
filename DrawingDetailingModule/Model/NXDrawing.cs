@@ -313,43 +313,12 @@ namespace DrawingDetailingModule.Model
                     continue;
                 }
                 foreach (var pt in descriptionModel.Points) 
-                {
-                    //double[] point = new double[] { pt.X, pt.Y, pt.Z };
-                    //CreateWCStartPoint(diam, height, point, direction);
-
+                {                    
                     CreateWCStartPoint(workPart, pt, height, diam, direction);
                 }
                 
             }
-        }
-
-        //public Tag CreateWCStartPoint(double diam, string height, double[] origin, double[] direction)
-        //{
-            
-        //    FeatureSigns sign = FeatureSigns.Nullsign;
-        //    Tag cyl_tag = Tag.Null;
-        //    Tag targ_tag = Tag.Null;            
-
-        //    try
-        //    {
-        //        ufs.Modl.CreateCylinder(sign, targ_tag, origin, height, diam.ToString(), direction, out cyl_tag);
-        //        if (cyl_tag != Tag.Null)
-        //        {
-        //            ufs.Obj.SetColor(cyl_tag, 186);
-        //            Console.WriteLine("Cylinder created successfully.");
-        //        }
-        //        else
-        //        {
-        //            Console.WriteLine("Cylinder creation failed: cyl_tag is null.");
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new ArgumentNullException("Create Cylinder error!");
-        //    }
-
-        //    return cyl_tag;            
-        //}
+        }        
 
         public Cylinder CreateWCStartPoint (Part workPart, Point3d basePoint, string height, double diameter, double[] direction)
         {            
