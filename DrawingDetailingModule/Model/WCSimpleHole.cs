@@ -26,7 +26,7 @@ namespace DrawingDetailingModule.Model
             WCStartPointDiamter = GetWCHoleSize(HoleDiameter);
 
             string description = $"{GetProcessAbbrevate()} <o>{HoleDiameter:F2} {wcOffset} {wcType}, " +
-                $"(<O>{WCStartPointDiamter:F1} {FeatureFactory.WC_SP})";
+                $"(<o>{WCStartPointDiamter:F1} {FeatureFactory.WC_SP})";
 
             return description;
         }

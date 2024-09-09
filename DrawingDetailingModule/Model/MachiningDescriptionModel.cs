@@ -68,7 +68,7 @@ namespace DrawingDetailingModule.Model
 
         public double GetWCStartPointDiameter(string input)
         {
-            string pattern = @"\(<O>(\d+(\.\d+)?) wc sp\)";
+            string pattern = @"\(<[oO]>(\d+(\.\d+)?) wc sp\)";
             string numberStr = "";
             Match match = Regex.Match(input, pattern);
             if (match.Success)

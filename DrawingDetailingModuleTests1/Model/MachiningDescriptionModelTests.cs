@@ -14,7 +14,8 @@ namespace DrawingDetailingModule.Model.Tests
         [TestMethod()]
         public void GetWCStartPointDiameterTest()
         {
-            string input = "WC <o>6.00 H7 S/C, (<O>3 wc sp)";
+            string input = "WC <o>6.00 H7 S/C (<o>3.0 wc sp), C'BORE <o>7.0 DP 20.0";
+;
             MachiningDescriptionModel descriptionModel = new MachiningDescriptionModel();
 
             double result = descriptionModel.GetWCStartPointDiameter(input);

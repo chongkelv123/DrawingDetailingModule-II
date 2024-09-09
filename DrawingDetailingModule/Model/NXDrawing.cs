@@ -301,9 +301,9 @@ namespace DrawingDetailingModule.Model
 
         public void GenerateWCStartPoints(List<MachiningDescriptionModel> descriptionModels)
         {
-           
+            
             foreach (MachiningDescriptionModel descriptionModel in descriptionModels)
-            {
+            {                
                 string abbr = descriptionModel.Abbrevate;
                 double diam = descriptionModel.GetWCStartPointDiameter(descriptionModel.Description);
                 string height = descriptionModel.Height;
@@ -314,21 +314,70 @@ namespace DrawingDetailingModule.Model
                 }
                 foreach (var pt in descriptionModel.Points) 
                 {
-                    double[] point = new double[] { pt.X, pt.Y, pt.Z };
-                    CreateWCStartPoint(diam, height, point, direction);
+                    //double[] point = new double[] { pt.X, pt.Y, pt.Z };
+                    //CreateWCStartPoint(diam, height, point, direction);
+
+                    CreateWCStartPoint(workPart, pt, height, diam, direction);
                 }
                 
             }
         }
 
-        public Tag CreateWCStartPoint(double diam, string height, double[] origin, double[] direction)
-        {
-            FeatureSigns sign = FeatureSigns.Nullsign;
-            Tag cyl_tag = Tag.Null;
-            Tag targ_tag = Tag.Null;
-            ufs.Modl.CreateCylinder(sign, targ_tag, origin, height, diam.ToString(), direction, out cyl_tag);
+        //public Tag CreateWCStartPoint(double diam, string height, double[] origin, double[] direction)
+        //{
+            
+        //    FeatureSigns sign = FeatureSigns.Nullsign;
+        //    Tag cyl_tag = Tag.Null;
+        //    Tag targ_tag = Tag.Null;            
 
-            return cyl_tag;
+        //    try
+        //    {
+        //        ufs.Modl.CreateCylinder(sign, targ_tag, origin, height, diam.ToString(), direction, out cyl_tag);
+        //        if (cyl_tag != Tag.Null)
+        //        {
+        //            ufs.Obj.SetColor(cyl_tag, 186);
+        //            Console.WriteLine("Cylinder created successfully.");
+        //        }
+        //        else
+        //        {
+        //            Console.WriteLine("Cylinder creation failed: cyl_tag is null.");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new ArgumentNullException("Create Cylinder error!");
+        //    }
+
+        //    return cyl_tag;            
+        //}
+
+        public Cylinder CreateWCStartPoint (Part workPart, Point3d basePoint, string height, double diameter, double[] direction)
+        {            
+            if(diameter <= 0)
+            {
+                throw new ArgumentNullException("The diameter can not <= zero in CreateWCStartPoint method." +
+                    "");
+            }
+
+            NXOpen.Features.CylinderBuilder cylinderBuilder = workPart.Features.CreateCylinderBuilder(null);
+            //NXOpen.Point baseNXPoint = workPart.Points.CreatePoint(basePoint);
+            cylinderBuilder.Origin = basePoint;
+            cylinderBuilder.Height.RightHandSide = height;
+            cylinderBuilder.Diameter.RightHandSide = diameter.ToString();
+            Vector3d cylinderAxis = new Vector3d(direction[0], direction[1], direction[2]);
+            cylinderBuilder.Direction = cylinderAxis;
+
+            Cylinder createdCylinder = cylinderBuilder.CommitFeature() as Cylinder;
+
+            DisplayableObject[] displayableObjects = createdCylinder.GetBodies();
+            DisplayModification displayModification = session.DisplayManager.NewDisplayModification();
+            displayModification.ApplyToAllFaces = true;
+            displayModification.NewColor = 55;
+            displayModification.Apply(displayableObjects);
+
+            displayModification.Dispose();       
+
+            return createdCylinder;
         }
 
         public bool IsDrawingOpen()
