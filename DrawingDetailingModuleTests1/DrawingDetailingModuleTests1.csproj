@@ -57,6 +57,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Model\AskBoundingBoxTests.cs" />
+    <Compile Include="Model\MachiningDescriptionModelTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
