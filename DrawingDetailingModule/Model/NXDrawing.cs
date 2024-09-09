@@ -285,25 +285,7 @@ namespace DrawingDetailingModule.Model
             NXOpen.Features.HolePackage holePackage = feature as NXOpen.Features.HolePackage;
             MyFeature feat = factory.GetFeature(feature);
             feat.GetFeatureDetailInformation(feature);
-            string description = feat.ToString();
-
-            //if (feat.GetProcessAbbrevate().Equals(FeatureFactory.WC))
-            //{
-            //    IMyWCFeature wc = null;
-            //    AskBoundingBox boundingBox = new AskBoundingBox(ufs, selectedBody[0].Tag);
-            //    string height = boundingBox.GetThickness();                
-
-            //    if (feat is WCCounterbore)
-            //    {
-            //        wc = (WCCounterbore)feat;
-            //    }
-            //    else if (feat is WCSimpleHole)
-            //    {
-            //        wc = (WCSimpleHole)feat;
-            //    }
-
-            //    //CreateWCStartPoint(wc.WCStartPointDiamter, height, origin, direction);
-            //}
+            string description = feat.ToString();            
 
             AskBoundingBox boundingBox = new AskBoundingBox(ufs, selectedBody[0].Tag);
 
