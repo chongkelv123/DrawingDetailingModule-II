@@ -297,51 +297,7 @@ namespace DrawingDetailingModule.Model
             descModel = new MachiningDescriptionModel(description, points.Count, points, feat.GetProcessAbbrevate(), boundingBox.AskDirection(point, AXIS.Z), height);
 
             return descModel;
-        }
-
-        //private bool IsPointContainInBoundingBox(List<Point3d> points, Tag selectedFaceTag, out List<Point3d> outPoints)
-        //{
-        //    const int INSIDE_BODY = 1;
-        //    const int OUTSIDE_BODY = 2;
-        //    const int ON_BODY = 3;
-
-        //    bool result = false;
-        //    List<Point3d> pointCollection = new List<Point3d>();
-
-        //    int pt_status = 0;
-        //    AskBoundingBox boundingBox = new AskBoundingBox(ufs, SelectedBody[0].Tag);
-        //    NXObject boundingBoxObj = boundingBox.CreateBoundingBox();
-        //    Block block = boundingBoxObj as Block;
-        //    Body[] bodies = block.GetBodies();
-
-        //    points.Sort((p1, p2) => p1.Z.CompareTo(p2.Z));
-
-        //    foreach (Point3d p in points)
-        //    {
-        //        double[] pt = new double[] { p.X, p.Y, p.Z };
-
-        //        ufs.Modl.AskPointContainment(pt, bodies[0].Tag, out pt_status);
-
-        //        switch (pt_status)
-        //        {
-        //            case OUTSIDE_BODY:
-        //                continue;
-        //            case INSIDE_BODY:
-        //                continue;
-        //            case ON_BODY:
-        //                pointCollection.Add(p);
-        //                result = true;
-        //                break;
-        //            default:
-        //                break;
-        //        }
-        //    }
-        //    outPoints = pointCollection;
-        //    Tag[] block_Tags = new Tag[] { block.Tag };
-        //    ufs.Modl.DeleteFeature(block_Tags);
-
-        //    return result;
-        //}
+        }        
 
         public void GenerateWCStartPoints(List<MachiningDescriptionModel> descriptionModels)
         {
