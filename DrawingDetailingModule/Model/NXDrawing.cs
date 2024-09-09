@@ -10,6 +10,7 @@ using NXOpenUI;
 using DrawingDetailingModule.Controller;
 using NXOpen.Features;
 using NXOpen.Annotations;
+using System.Windows.Forms;
 
 namespace DrawingDetailingModule.Model
 {
@@ -19,35 +20,37 @@ namespace DrawingDetailingModule.Model
         Part workPart;
         UI ui;
         UFSession ufs;
-        Control control;
+        Controller.Control control;
 
-        List<TaggedObject> selectedBodys;
+        List<TaggedObject> selectedBody;
         List<Point3d> locatedPoint;
-        public List<TaggedObject> SelectedBodys
+        public List<TaggedObject> SelectedBody
         {
-            get { return selectedBodys; }
-            set { selectedBodys = value; }
+            get { return selectedBody; }
+            set { selectedBody = value; }
         }
         public List<Point3d> LocatedPoint
         {
             get { return locatedPoint; }
             set { locatedPoint = value; }
         }
-        public bool IsFaceSelected => selectedBodys.Count > 0;
+        public bool IsFaceSelected => selectedBody.Count > 0;
         public bool IsPointLocated => locatedPoint.Count > 0;
 
-        public NXDrawing(Control control)
+        public NXDrawing(Controller.Control control)
         {
             session = Session.GetSession();
             ufs = UFSession.GetUFSession();
             workPart = session.Parts.Work;
             ui = UI.GetUI();
 
-            selectedBodys = new List<TaggedObject>();
+            selectedBody = new List<TaggedObject>();
             locatedPoint = new List<Point3d>();
 
             this.control = control;
         }
+
+        public NXDrawing() { }
 
         public List<TaggedObject> SelectBody()
         {
@@ -142,13 +145,13 @@ namespace DrawingDetailingModule.Model
             int numOfColumn = 3;
             int numOfSkipAlp = 0;
             int tempInt = 0;
-            
+
             for (int i = 0; i < descriptionModels.Count; i++)
             {
                 ufs.Tabnot.AskNthRow(tabNote, i + 1, out row);
 
                 PlaceAnnotation(descriptionModels[i].Points, NumberToAlphabet(i + numOfSkipAlp, out tempInt));
-                if(tempInt > 0)
+                if (tempInt > 0)
                 {
                     numOfSkipAlp = tempInt;
                 }
@@ -176,7 +179,7 @@ namespace DrawingDetailingModule.Model
         }
 
         private void PlaceAnnotation(List<Point3d> points, string alphabet)
-        {               
+        {
             string[] text_string = new string[1];
             text_string[0] = alphabet;
 
@@ -199,7 +202,7 @@ namespace DrawingDetailingModule.Model
             {
                 numberOfSkipAlphabet++;
                 asciiDec += numberOfSkipAlphabet;
-            }            
+            }
 
             if (asciiDec <= 90)
             {
@@ -233,7 +236,7 @@ namespace DrawingDetailingModule.Model
         }
 
         public List<MachiningDescriptionModel> IterateFeatures()
-        {               
+        {
             var featureCollection = workPart.Features;
             FeatureFactory factory = new FeatureFactory();
 
@@ -255,16 +258,16 @@ namespace DrawingDetailingModule.Model
                     }
                 }
                 else if (feature.GetType() == typeof(NXOpen.Features.Extrude))
-                {                    
+                {
                     //descModel = ProcessExtrudeFeat(factory, feature);
                 }
             }
 
             return descModels;
-        }        
+        }
 
         private MachiningDescriptionModel ProcessExtrudeFeat(FeatureFactory factory, Feature feature)
-        {            
+        {
             MachiningDescriptionModel descModel;
             NXOpen.Features.Extrude extrude = feature as NXOpen.Features.Extrude;
             MyFeature feat = factory.GetFeature(feature);
@@ -277,63 +280,117 @@ namespace DrawingDetailingModule.Model
         }
 
         private MachiningDescriptionModel ProcessHolePackage(FeatureFactory factory, Feature feature)
-        {            
+        {
             MachiningDescriptionModel descModel;
             NXOpen.Features.HolePackage holePackage = feature as NXOpen.Features.HolePackage;
             MyFeature feat = factory.GetFeature(feature);
             feat.GetFeatureDetailInformation(feature);
             string description = feat.ToString();
 
-            List<Point3d> points = feat.GetLocation();
-            List<Point3d> outPoints = new List<Point3d>();       
+            //if (feat.GetProcessAbbrevate().Equals(FeatureFactory.WC))
+            //{
+            //    IMyWCFeature wc = null;
+            //    AskBoundingBox boundingBox = new AskBoundingBox(ufs, selectedBody[0].Tag);
+            //    string height = boundingBox.GetThickness();                
 
-            descModel = new MachiningDescriptionModel(description, points.Count, points);
-            
+            //    if (feat is WCCounterbore)
+            //    {
+            //        wc = (WCCounterbore)feat;
+            //    }
+            //    else if (feat is WCSimpleHole)
+            //    {
+            //        wc = (WCSimpleHole)feat;
+            //    }
+
+            //    //CreateWCStartPoint(wc.WCStartPointDiamter, height, origin, direction);
+            //}
+
+            AskBoundingBox boundingBox = new AskBoundingBox(ufs, selectedBody[0].Tag);
+
+            List<Point3d> points = feat.GetLocation();
+            List<Point3d> outPoints = new List<Point3d>();
+            double[] point = new double[3] { points[0].X, points[0].Y, points[0].Z };
+            string height = boundingBox.GetThickness();            
+
+            descModel = new MachiningDescriptionModel(description, points.Count, points, feat.GetProcessAbbrevate(), boundingBox.AskDirection(point, AXIS.Z), height);
+
             return descModel;
         }
 
-        private bool IsPointContainInBoundingBox(List<Point3d> points, Tag selectedFaceTag, out List<Point3d> outPoints)
+        //private bool IsPointContainInBoundingBox(List<Point3d> points, Tag selectedFaceTag, out List<Point3d> outPoints)
+        //{
+        //    const int INSIDE_BODY = 1;
+        //    const int OUTSIDE_BODY = 2;
+        //    const int ON_BODY = 3;
+
+        //    bool result = false;
+        //    List<Point3d> pointCollection = new List<Point3d>();
+
+        //    int pt_status = 0;
+        //    AskBoundingBox boundingBox = new AskBoundingBox(ufs, SelectedBody[0].Tag);
+        //    NXObject boundingBoxObj = boundingBox.CreateBoundingBox();
+        //    Block block = boundingBoxObj as Block;
+        //    Body[] bodies = block.GetBodies();
+
+        //    points.Sort((p1, p2) => p1.Z.CompareTo(p2.Z));
+
+        //    foreach (Point3d p in points)
+        //    {
+        //        double[] pt = new double[] { p.X, p.Y, p.Z };
+
+        //        ufs.Modl.AskPointContainment(pt, bodies[0].Tag, out pt_status);
+
+        //        switch (pt_status)
+        //        {
+        //            case OUTSIDE_BODY:
+        //                continue;
+        //            case INSIDE_BODY:
+        //                continue;
+        //            case ON_BODY:
+        //                pointCollection.Add(p);
+        //                result = true;
+        //                break;
+        //            default:
+        //                break;
+        //        }
+        //    }
+        //    outPoints = pointCollection;
+        //    Tag[] block_Tags = new Tag[] { block.Tag };
+        //    ufs.Modl.DeleteFeature(block_Tags);
+
+        //    return result;
+        //}
+
+        public void GenerateWCStartPoints(List<MachiningDescriptionModel> descriptionModels)
         {
-            const int INSIDE_BODY = 1;
-            const int OUTSIDE_BODY = 2;
-            const int ON_BODY = 3;
-            
-            bool result = false;
-            List<Point3d> pointCollection = new List<Point3d>();
-
-            int pt_status = 0;
-            AskBoundingBox boundingBox = new AskBoundingBox(ufs, SelectedBodys[0].Tag);
-            NXObject boundingBoxObj = boundingBox.CreateBoundingBox();
-            Block block = boundingBoxObj as Block;
-            Body[] bodies = block.GetBodies();
-
-            points.Sort((p1, p2) => p1.Z.CompareTo(p2.Z));
-
-            foreach (Point3d p in points)
+           
+            foreach (MachiningDescriptionModel descriptionModel in descriptionModels)
             {
-                double[] pt = new double[] { p.X, p.Y, p.Z };
-
-                ufs.Modl.AskPointContainment(pt, bodies[0].Tag, out pt_status);
-
-                switch (pt_status)
+                string abbr = descriptionModel.Abbrevate;
+                double diam = descriptionModel.GetWCStartPointDiameter(descriptionModel.Description);
+                string height = descriptionModel.Height;
+                double[] direction = descriptionModel.Direction;
+                if (abbr != FeatureFactory.WC)
                 {
-                    case OUTSIDE_BODY:
-                        continue;
-                    case INSIDE_BODY:
-                        continue;
-                    case ON_BODY:
-                        pointCollection.Add(p);
-                        result = true;
-                        break;
-                    default:
-                        break;
+                    continue;
                 }
-            }            
-            outPoints = pointCollection;
-            Tag[] block_Tags = new Tag[] { block.Tag };
-            ufs.Modl.DeleteFeature(block_Tags);
+                foreach (var pt in descriptionModel.Points) 
+                {
+                    double[] point = new double[] { pt.X, pt.Y, pt.Z };
+                    CreateWCStartPoint(diam, height, point, direction);
+                }
+                
+            }
+        }
 
-            return result;
+        public Tag CreateWCStartPoint(double diam, string height, double[] origin, double[] direction)
+        {
+            FeatureSigns sign = FeatureSigns.Nullsign;
+            Tag cyl_tag = Tag.Null;
+            Tag targ_tag = Tag.Null;
+            ufs.Modl.CreateCylinder(sign, targ_tag, origin, height, diam.ToString(), direction, out cyl_tag);
+
+            return cyl_tag;
         }
 
         public bool IsDrawingOpen()

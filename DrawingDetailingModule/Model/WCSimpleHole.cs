@@ -7,9 +7,12 @@ using NXOpen.Features;
 
 namespace DrawingDetailingModule.Model
 {
-    public class WCSimpleHole : SimpleHole2
+    public class WCSimpleHole : SimpleHole2, IMyWCFeature
     {
         Feature feature;
+
+        public double WCStartPointDiamter { get; set; }
+
         public WCSimpleHole(HolePackage hole) : base(hole)
         {
             feature = hole;
@@ -17,18 +20,18 @@ namespace DrawingDetailingModule.Model
         public override string GetProcessAbbrevate() => "WC";
 
         public override string ToString()
-        {            
-            string wcType = GetWCCondition(feature);            
+        {
+            string wcType = GetWCCondition(feature);
             string wcOffset = GetWCOffset(feature);
-            double wcholeDiameter  = GetWCHoleSize(HoleDiameter);
+            WCStartPointDiamter = GetWCHoleSize(HoleDiameter);
 
             string description = $"{GetProcessAbbrevate()} <o>{HoleDiameter:F2} {wcOffset} {wcType}, " +
-                $"(<O>{wcholeDiameter} {FeatureFactory.WC_SP})";            
+                $"(<O>{WCStartPointDiamter:F1} {FeatureFactory.WC_SP})";
 
             return description;
         }
 
-        
+
     }
 
 

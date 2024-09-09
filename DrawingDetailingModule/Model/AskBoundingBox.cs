@@ -9,6 +9,10 @@ using NXOpen.Utilities;
 
 namespace DrawingDetailingModule.Model
 {
+    public enum AXIS
+    {
+        X = 1, Y = 2, Z = 3,
+    }
     public class AskBoundingBox
     {
         double[] boundingBox = new double[6];
@@ -47,7 +51,7 @@ namespace DrawingDetailingModule.Model
             set { boundingBox[5] = value; }
         }
         public AskBoundingBox(UFSession ufs, Tag boundingBoxTag)
-        {            
+        {
             this.ufs = ufs;
             this.ufs.Modl.AskBoundingBox(boundingBoxTag, boundingBox);
         }
@@ -77,7 +81,7 @@ namespace DrawingDetailingModule.Model
         public bool IsFromBackDirection(double ptY)
         {
             return (MaxY == ptY);
-        }   
+        }
 
         public NXObject CreateBoundingBox()
         {
@@ -151,6 +155,44 @@ namespace DrawingDetailingModule.Model
         {
             return Math.Abs(eval) > precision &&
                 Math.Abs(eval) < Math.Abs(precision);
+        }
+
+        public double[] AskDirection(double[] point, AXIS Axis)
+        {
+            double[] result = new double[3];
+            result[0] = 0;
+            result[1] = 0;
+            result[2] = 0;
+
+            switch (Axis)
+            {
+                case AXIS.X:
+                    break;
+                case AXIS.Y:
+                    break;
+                case AXIS.Z:
+                    if (MinZ == point[2])
+                    {
+                        result[2] = 1;
+                    }
+                    else if (MaxZ == point[2])
+                    {
+                        result[2] = -1;
+                    }
+                    else if (MinZ < point[2])
+                    {
+                        result[2] = -1;
+                    }
+                    else if (MaxZ > point[2])
+                    {
+                        result[2] = 1;
+                    }
+                    break;
+                default:
+                    throw new ArgumentException("Wrong Axis supplied in AskBoudingBox");
+            }
+
+            return result;
         }
     }
 }

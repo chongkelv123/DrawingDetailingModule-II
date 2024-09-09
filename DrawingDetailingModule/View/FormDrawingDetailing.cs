@@ -28,7 +28,7 @@ namespace DrawingDetailingModule.View
 
         private void btnSelectFace_Click(object sender, EventArgs e)
         {
-            control.GetDrawing.SelectedBodys = control.GetDrawing.SelectBody();
+            control.GetDrawing.SelectedBody = control.GetDrawing.SelectBody();
             updateBtnSelectFaceStage();
             updateBtnApplyStage();
         }
@@ -43,7 +43,7 @@ namespace DrawingDetailingModule.View
 
         private void updateBtnSelectFaceStage()
         {
-            if (control.GetDrawing.SelectedBodys.Count > 0)
+            if (control.GetDrawing.SelectedBody.Count > 0)
             {
                 btnSelectFace.Image = Properties.Resources.correct;
             }

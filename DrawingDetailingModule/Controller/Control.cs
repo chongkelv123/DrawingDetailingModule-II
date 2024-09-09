@@ -36,6 +36,7 @@ namespace DrawingDetailingModule.Controller
             {
                 descriptionModels = GetDrawing.IterateFeatures();
                 GetDrawing.CreateTable(GetDrawing.LocatedPoint[0], descriptionModels);
+                GetDrawing.GenerateWCStartPoints(descriptionModels);
             }
             catch (Exception err)
             {
