@@ -17,7 +17,7 @@ namespace DrawingDetailingModule.Model
         {
             this.feature = feature;
         }
-        public override string GetProcessAbbrevate() => "WC";
+        public override string GetProcessAbbrevate() => FeatureFactory.WC;
 
         public override string ToString()
         {

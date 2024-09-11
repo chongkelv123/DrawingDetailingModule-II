@@ -81,5 +81,21 @@ namespace DrawingDetailingModule.Model
 
             return result;
         }
+
+        public double GetWCHoleDiameter(string input)
+        {
+            string pattern = @"WC <[Oo]>(\d+(\.\d+)?)";
+            string numberStr = "";
+            Match match = Regex.Match(input, pattern);
+            if (match.Success)
+            {
+                numberStr = match.Groups[1].Value;
+            }
+
+            double result;
+            Double.TryParse(numberStr, out result);
+
+            return result;
+        }
     }
 }

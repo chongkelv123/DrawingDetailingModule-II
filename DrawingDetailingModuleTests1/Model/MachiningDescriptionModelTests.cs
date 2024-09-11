@@ -14,13 +14,23 @@ namespace DrawingDetailingModule.Model.Tests
         [TestMethod()]
         public void GetWCStartPointDiameterTest()
         {
-            string input = "WC <o>6.00 H7 S/C (<o>3.0 wc sp), C'BORE <o>7.0 DP 20.0";
-;
+            string input = "WC <o>6.00 H7 S/C (<o>3.0 wc sp), C'BORE <o>7.0 DP 20.0";            
             MachiningDescriptionModel descriptionModel = new MachiningDescriptionModel();
 
             double result = descriptionModel.GetWCStartPointDiameter(input);
 
             Assert.AreEqual(3.0, result);
+        }
+
+        [TestMethod()]
+        public void GetWCHoleDiameterTest()
+        {
+            string input = "WC <o>6.00 H7 S/C (<o>3.0 wc sp), C'BORE <o>7.0 DP 20.0";            
+            MachiningDescriptionModel descriptionModel = new MachiningDescriptionModel();
+
+            double result = descriptionModel.GetWCHoleDiameter(input);
+
+            Assert.AreEqual(6.00, result);
         }
     }
 }

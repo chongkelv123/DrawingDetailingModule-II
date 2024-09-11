@@ -51,6 +51,8 @@ namespace DrawingDetailingModule.Model
                     return SimpleHoleClassification(feature, iterator);
                 case DRILL:
                     return new SimpleHole2(holePackage);
+                case EXTRUDE:
+                    return new WCPocketFeature(feature);
                 default:
                     throw new ArgumentNullException($"Error on: {processType}");
             }

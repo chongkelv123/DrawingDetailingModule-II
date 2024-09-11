@@ -11,6 +11,7 @@ using DrawingDetailingModule.Controller;
 using NXOpen.Features;
 using NXOpen.Annotations;
 using System.Windows.Forms;
+using NXOpen.CAE.Connections;
 
 namespace DrawingDetailingModule.Model
 {
@@ -236,7 +237,7 @@ namespace DrawingDetailingModule.Model
         }
 
         public List<MachiningDescriptionModel> IterateFeatures()
-        {
+        {                        
             var featureCollection = workPart.Features;
             FeatureFactory factory = new FeatureFactory();
 
@@ -259,22 +260,42 @@ namespace DrawingDetailingModule.Model
                 }
                 else if (feature.GetType() == typeof(NXOpen.Features.Extrude))
                 {
-                    //descModel = ProcessExtrudeFeat(factory, feature);
-                }
+                    AttributeIterator machiningAttIterator = workPart.CreateAttributeIterator();
+                    machiningAttIterator.SetIncludeOnlyTitle(FeatureFactory.TYPE);
+                    if (feature.HasUserAttribute(machiningAttIterator))
+                    {
+                        descModel = ProcessWCFeat(factory, feature);
+                        if (MachiningDescriptionModel.IsDescriptionSame(descModels, descModel))
+                        {
+                            MachiningDescriptionModel.SumUpModelQuantity(descModels, descModel);
+                            MachiningDescriptionModel.AppendModelPoints(descModels, descModel);
+                        }
+                        else
+                        {
+                            descModels.Add(descModel);
+                        }
+                    }                    
+                }                
             }
 
             return descModels;
         }
 
-        private MachiningDescriptionModel ProcessExtrudeFeat(FeatureFactory factory, Feature feature)
-        {
+        private MachiningDescriptionModel ProcessWCFeat(FeatureFactory factory, Feature feature)
+        {            
             MachiningDescriptionModel descModel;
             NXOpen.Features.Extrude extrude = feature as NXOpen.Features.Extrude;
-            MyFeature feat = factory.GetFeature(feature);
-            feat.GetFeatureDetailInformation(extrude);
-            string description = feat.ToString();
+            WCPocketFeature wcFeat = factory.GetFeature(feature) as WCPocketFeature;
+            wcFeat.GetFeatureDetailInformation(extrude);
+            string description = wcFeat.ToString();
 
-            descModel = null;
+            List<Point3d> points = wcFeat.GenerateWCSPLocation();
+
+            AskBoundingBox boundingBox = new AskBoundingBox(ufs, selectedBody[0].Tag);
+            double[] point = new double[3] { points[0].X, points[0].Y, points[0].Z };
+            string height = boundingBox.GetThickness();
+
+            descModel = new MachiningDescriptionModel(description, points.Count, points, wcFeat.GetProcessAbbrevate(), boundingBox.AskDirection(point, AXIS.Z), height);
 
             return descModel;
         }
@@ -283,53 +304,58 @@ namespace DrawingDetailingModule.Model
         {
             MachiningDescriptionModel descModel;
             NXOpen.Features.HolePackage holePackage = feature as NXOpen.Features.HolePackage;
-            MyFeature feat = factory.GetFeature(feature);
-            feat.GetFeatureDetailInformation(feature);
-            string description = feat.ToString();            
+            MyHoleFeature holeFeat = factory.GetFeature(feature) as MyHoleFeature;
+            holeFeat.GetFeatureDetailInformation(feature);
+            string description = holeFeat.ToString();
 
             AskBoundingBox boundingBox = new AskBoundingBox(ufs, selectedBody[0].Tag);
 
-            List<Point3d> points = feat.GetLocation();
+            List<Point3d> points = holeFeat.GetLocation();
             List<Point3d> outPoints = new List<Point3d>();
             double[] point = new double[3] { points[0].X, points[0].Y, points[0].Z };
-            string height = boundingBox.GetThickness();            
+            string height = boundingBox.GetThickness();
 
-            descModel = new MachiningDescriptionModel(description, points.Count, points, feat.GetProcessAbbrevate(), boundingBox.AskDirection(point, AXIS.Z), height);
+            descModel = new MachiningDescriptionModel(description, points.Count, points, holeFeat.GetProcessAbbrevate(), boundingBox.AskDirection(point, AXIS.Z), height);
 
             return descModel;
-        }        
+        }
 
         public void GenerateWCStartPoints(List<MachiningDescriptionModel> descriptionModels)
         {
-            
             foreach (MachiningDescriptionModel descriptionModel in descriptionModels)
-            {                
+            {
                 string abbr = descriptionModel.Abbrevate;
-                double diam = descriptionModel.GetWCStartPointDiameter(descriptionModel.Description);
+                double wcspDiameter = descriptionModel.GetWCStartPointDiameter(descriptionModel.Description);
+                double wcDiameter = descriptionModel.GetWCHoleDiameter(descriptionModel.Description);
                 string height = descriptionModel.Height;
                 double[] direction = descriptionModel.Direction;
+                double ratio = wcDiameter / wcspDiameter;
                 if (abbr != FeatureFactory.WC)
                 {
                     continue;
                 }
-                foreach (var pt in descriptionModel.Points) 
-                {                    
-                    CreateWCStartPoint(workPart, pt, height, diam, direction);
+
+                foreach (var pt in descriptionModel.Points)
+                {
+                    Point3d point = pt;
+                    if (ratio >= 3.0)
+                    {
+                        double moveDistance = (wcDiameter / 2) - Math.Abs(wcspDiameter);
+                        point = new Point3d(pt.X - moveDistance, pt.Y, pt.Z);
+                    }
+                    CreateWCStartPoint(workPart, point, height, wcspDiameter, direction);
                 }
-                
             }
-        }        
+        }
 
-        public Cylinder CreateWCStartPoint (Part workPart, Point3d basePoint, string height, double diameter, double[] direction)
-        {            
-            if(diameter <= 0)
+        public Cylinder CreateWCStartPoint(Part workPart, Point3d basePoint, string height, double diameter, double[] direction)
+        {
+            if (diameter <= 0)
             {
-                throw new ArgumentNullException("The diameter can not <= zero in CreateWCStartPoint method." +
-                    "");
+                throw new ArgumentNullException("The diameter can not <= zero in CreateWCStartPoint method.");
             }
 
-            NXOpen.Features.CylinderBuilder cylinderBuilder = workPart.Features.CreateCylinderBuilder(null);
-            //NXOpen.Point baseNXPoint = workPart.Points.CreatePoint(basePoint);
+            NXOpen.Features.CylinderBuilder cylinderBuilder = workPart.Features.CreateCylinderBuilder(null);            
             cylinderBuilder.Origin = basePoint;
             cylinderBuilder.Height.RightHandSide = height;
             cylinderBuilder.Diameter.RightHandSide = diameter.ToString();
@@ -344,7 +370,7 @@ namespace DrawingDetailingModule.Model
             displayModification.NewColor = 55;
             displayModification.Apply(displayableObjects);
 
-            displayModification.Dispose();       
+            displayModification.Dispose();
 
             return createdCylinder;
         }

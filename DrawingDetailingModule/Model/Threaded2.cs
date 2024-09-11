@@ -9,7 +9,7 @@ using NXOpen.UF;
 
 namespace DrawingDetailingModule.Model
 {
-    public class Threaded2 : MyFeature
+    public class Threaded2 : MyHoleFeature
     {
         public string ThreadSide { get; set; }
         public double ThreadDepth { get; set; }

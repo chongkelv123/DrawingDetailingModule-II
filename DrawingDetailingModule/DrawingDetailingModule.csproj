@@ -72,7 +72,6 @@
     <Compile Include="Model\IMyWCFeature.cs" />
     <Compile Include="Model\MachiningDescriptionModel.cs" />
     <Compile Include="Model\MyFeature.cs" />
-    <Compile Include="Model\MyExtrudeFeature.cs" />
     <Compile Include="Model\MyHoleFeature.cs" />
     <Compile Include="Model\ReamCounterbore.cs" />
     <Compile Include="Model\ReamSimpleHole.cs" />
@@ -80,6 +79,7 @@
     <Compile Include="Model\SimpleHole2.cs" />
     <Compile Include="Model\Threaded2.cs" />
     <Compile Include="Model\WCCounterbore.cs" />
+    <Compile Include="Model\WCPocketFeature.cs" />
     <Compile Include="Model\WCSimpleHole.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Main\Unload.cs" />

@@ -28,7 +28,7 @@ namespace DrawingDetailingModule.Controller
         }
 
         public void Start()
-        {                  
+        {
             double currentTextSize = GetDrawing.GetCurrentTextSize();
             GetDrawing.SetTextSize(myForm.FontSize);
             List<MachiningDescriptionModel> descriptionModels = new List<MachiningDescriptionModel>();

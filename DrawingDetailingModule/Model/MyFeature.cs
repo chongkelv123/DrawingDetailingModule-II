@@ -22,26 +22,16 @@ namespace DrawingDetailingModule.Model
         {
             workPart = Session.GetSession().Parts.Work;
             points = new List<Point3d>();
-            ufs = UFSession.GetUFSession();
-
-            GetCenterPoints(feature);
+            ufs = UFSession.GetUFSession();            
         }
 
         public MyFeature()
         {
         }
 
-        public abstract void GetFeatureDetailInformation(Feature feature);
-
         public abstract string GetProcessAbbrevate();
 
-        public void GetCenterPoints(Feature feature)
-        {            
-            HolePackage holePackage = feature as HolePackage;
-            Point3d[] origins;
-            holePackage.GetOrigins(out origins);
-            origins.ToList().ForEach(x => points.Add(new Point3d(x.X, x.Y, x.Z)));
-        }
+        public abstract void GetFeatureDetailInformation(Feature feature);
 
         public static string GetProcessType(Feature feature)
         {
@@ -52,11 +42,6 @@ namespace DrawingDetailingModule.Model
                 return match.Groups[1].Value;
             }
             return "";
-        }
-
-        public List<Point3d> GetLocation()
-        {
-            return points;
         }
 
         public string ToString(List<Point2d> points)

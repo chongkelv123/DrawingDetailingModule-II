@@ -55,7 +55,7 @@ namespace DrawingDetailingModule.Model
             Quantity = points.Count;
             TaggedObject taggedObject = NXOpen.Utilities.NXObjectManager.Get(holePackage.Tag);
             IsThruHole = AskThruHole(holePackage);
-        }
+        }  
     }
 
 }
