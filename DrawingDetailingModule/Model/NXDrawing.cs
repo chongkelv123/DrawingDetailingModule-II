@@ -237,7 +237,7 @@ namespace DrawingDetailingModule.Model
         }
 
         public List<MachiningDescriptionModel> IterateFeatures()
-        {                        
+        {
             var featureCollection = workPart.Features;
             FeatureFactory factory = new FeatureFactory();
 
@@ -274,8 +274,8 @@ namespace DrawingDetailingModule.Model
                         {
                             descModels.Add(descModel);
                         }
-                    }                    
-                }                
+                    }
+                }
             }
 
             return descModels;
@@ -286,7 +286,10 @@ namespace DrawingDetailingModule.Model
             MachiningDescriptionModel descModel;
             NXOpen.Features.Extrude extrude = feature as NXOpen.Features.Extrude;
             WCPocketFeature wcFeat = factory.GetFeature(feature) as WCPocketFeature;
+            wcFeat.ufs = ufs;
             wcFeat.GetFeatureDetailInformation(extrude);
+            wcFeat.SelectedBody = selectedBody[0];
+            
             string description = wcFeat.ToString();
 
             List<Point3d> points = wcFeat.GenerateWCSPLocation();
@@ -355,7 +358,7 @@ namespace DrawingDetailingModule.Model
                 throw new ArgumentNullException("The diameter can not <= zero in CreateWCStartPoint method.");
             }
 
-            NXOpen.Features.CylinderBuilder cylinderBuilder = workPart.Features.CreateCylinderBuilder(null);            
+            NXOpen.Features.CylinderBuilder cylinderBuilder = workPart.Features.CreateCylinderBuilder(null);
             cylinderBuilder.Origin = basePoint;
             cylinderBuilder.Height.RightHandSide = height;
             cylinderBuilder.Diameter.RightHandSide = diameter.ToString();

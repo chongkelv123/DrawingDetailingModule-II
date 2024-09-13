@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NXOpen.UF;
 using NXOpen;
+using NXOpen.Features;
 using NXOpen.Utilities;
 
 namespace DrawingDetailingModule.Model
@@ -56,7 +57,11 @@ namespace DrawingDetailingModule.Model
             this.ufs.Modl.AskBoundingBox(boundingBoxTag, boundingBox);
         }
 
-        public AskBoundingBox() { }
+        public AskBoundingBox()
+        {
+            UFSession ufs = UFSession.GetUFSession();
+            this.ufs = ufs;
+        }
 
         public bool IsFromTopDirection(double ptZ)
         {
@@ -193,6 +198,38 @@ namespace DrawingDetailingModule.Model
             }
 
             return result;
+        }
+
+        public bool IsPointContainInBoundary (Point3d p, Tag SelectedBodyTag)
+        {
+            const int INSIDE_BODY = 1;
+            const int OUTSIDE_BODY = 2;
+            const int ON_BODY = 3;
+
+            int pt_status = 0;
+            AskBoundingBox boundingBox = new AskBoundingBox(ufs, SelectedBodyTag);
+            TaggedObject obj = NXObjectManager.Get(SelectedBodyTag);
+            Body body = obj as Body;
+            Body[] bodies = { body };
+
+            double[] pt = new double[] { p.X, p.Y, p.Z };
+
+            ufs.Modl.AskPointContainment(pt, bodies[0].Tag, out pt_status);
+
+            if (pt_status == OUTSIDE_BODY)
+            {
+                return false;
+            }
+            else if (pt_status == ON_BODY)
+            {
+                return true;
+            }
+            else if (pt_status == INSIDE_BODY)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

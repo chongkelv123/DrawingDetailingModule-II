@@ -1,4 +1,5 @@
 ﻿using NXOpen;
+using NXOpen.UF;
 using NXOpen.Features;
 using System;
 using System.Collections.Generic;
@@ -11,8 +12,11 @@ namespace DrawingDetailingModule.Model
     public class WCPocketFeature : MyFeature
     {
         Extrude extrureFeat;
-        SketchFeature sketchFeat;
+        Feature sketchFeat;
         List<Point3d> wcspBasePoint;
+        public UFSession ufs { get; set; }
+        
+        public TaggedObject SelectedBody { get; set; }
 
         Feature feature;
         public double WCStartPointDiamter { get; set; }
@@ -25,21 +29,23 @@ namespace DrawingDetailingModule.Model
         {
             this.feature = feature;
             extrureFeat = feature as Extrude;
-            sketchFeat = GetSketchFeat(feature);
-            wcspBasePoint = GenerateWCSPLocation();
+            sketchFeat = GetSketchFeat(feature);            
         }
 
-        private SketchFeature GetSketchFeat(Feature feature)
+        private Feature GetSketchFeat(Feature feature)
         {
-            SketchFeature result = null;
+            Feature result = null;
             foreach (NXObject ent in feature.GetParents())
             {
                 if (ent is SketchFeature)
                 {
                     return (SketchFeature)ent;
-                }                
+                }
+                else if (ent is WaveSketch)
+                {
+                    return (WaveSketch)ent;
+                }
             }
-
             return result;
         }
 
@@ -78,11 +84,20 @@ namespace DrawingDetailingModule.Model
             }
 
             if (longestLine != null)
-            {
+            {                
                 Point3d midPoint = calculateMidPoint(longestLine);
-                Point3d offsetPoint = OffsetPerpendicular(longestLine, midPoint, 3.0);
+                bool flip = true;
+                Point3d offsetPoint = OffsetPerpendicular(longestLine, midPoint, 3.0, flip);
+                AskBoundingBox askBounding = new AskBoundingBox(ufs, SelectedBody.Tag);                
+                flip = askBounding.IsPointContainInBoundary(offsetPoint, SelectedBody.Tag);
+                if (flip)
+                {
+                    offsetPoint = OffsetPerpendicular(longestLine, midPoint, 3.0, !flip);
+                }
                 points.Add(offsetPoint);
             }
+
+            wcspBasePoint = points;
 
             return points;
         }
@@ -107,7 +122,7 @@ namespace DrawingDetailingModule.Model
             return length;
         }
 
-        public static Point3d OffsetPerpendicular(Line line, Point3d midPoint, double offsetDistance)
+        public static Point3d OffsetPerpendicular(Line line, Point3d midPoint, double offsetDistance, bool flip)
         {
             // Calculate the direction of the line (normalized vector)
             Vector3d lineDirection = new Vector3d(
@@ -128,12 +143,24 @@ namespace DrawingDetailingModule.Model
             // Calculate a vector perpendicular to the line in 2D (XY plane)
             Vector3d perpendicularDirection = new Vector3d(-lineDirection.Y, lineDirection.X, 0);
 
-            // Offset the midpoint by the perpendicular vector
-            Point3d offsetPoint = new Point3d(
-                midPoint.X - perpendicularDirection.X * offsetDistance,
-                midPoint.Y - perpendicularDirection.Y * offsetDistance,
-                midPoint.Z  // Z remains the same (2D sketch assumption)
-            );
+            Point3d offsetPoint;
+            if (flip)
+            {
+                // Offset the midpoint by the perpendicular vector
+                offsetPoint = new Point3d(
+                    midPoint.X - perpendicularDirection.X * offsetDistance,
+                    midPoint.Y - perpendicularDirection.Y * offsetDistance,
+                    midPoint.Z  // Z remains the same (2D sketch assumption)
+                );
+            }
+            else
+            {
+                offsetPoint = new Point3d(
+                    midPoint.X + perpendicularDirection.X * offsetDistance,
+                    midPoint.Y + perpendicularDirection.Y * offsetDistance,
+                    midPoint.Z  // Z remains the same (2D sketch assumption)
+                );
+            }
 
             return offsetPoint;
         }
