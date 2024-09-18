@@ -11,16 +11,16 @@ using System.Threading.Tasks;
 
 namespace DrawingDetailingModule.Model
 {
-    public class BoundingBox
+    public class GetBoundingBoxInfo
     {
         public Point3d MaxPoint { get; set; }
         public Point3d MinPoint { get; set; }
         public Point3d MidPoint { get; set; }
         Feature feature;
         List<Point3d> pointCollection;
-        public BoundingBox(Feature feature)
+        public GetBoundingBoxInfo(Feature sketchFeature)
         {
-            this.feature = feature;
+            this.feature = sketchFeature;
             pointCollection = new List<Point3d>();
             process();
         }

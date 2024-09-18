@@ -51,8 +51,6 @@ namespace DrawingDetailingModule.Model
             this.control = control;
         }
 
-        public NXDrawing() { }
-
         public List<TaggedObject> SelectBody()
         {
             Selection selManager = ui.SelectionManager;
@@ -243,36 +241,45 @@ namespace DrawingDetailingModule.Model
 
             List<MachiningDescriptionModel> descModels = new List<MachiningDescriptionModel>();
             MachiningDescriptionModel descModel;
+            MachiningDescriptionModel tmpDescModel;
             foreach (Feature feature in featureCollection)
             {
                 if (feature.GetType() == typeof(NXOpen.Features.HolePackage))
                 {
                     descModel = ProcessHolePackage(factory, feature);
-                    if (MachiningDescriptionModel.IsDescriptionSame(descModels, descModel))
+                    tmpDescModel = ProcessMachiningDescription(descModels, descModel);
+                    if (tmpDescModel != null)
                     {
-                        MachiningDescriptionModel.SumUpModelQuantity(descModels, descModel);
-                        MachiningDescriptionModel.AppendModelPoints(descModels, descModel);
+                        descModels.Add(tmpDescModel);
                     }
-                    else
-                    {
-                        descModels.Add(descModel);
-                    }
+
                 }
                 else if (feature.GetType() == typeof(NXOpen.Features.Extrude))
                 {
                     AttributeIterator machiningAttIterator = workPart.CreateAttributeIterator();
                     machiningAttIterator.SetIncludeOnlyTitle(FeatureFactory.TYPE);
-                    if (feature.HasUserAttribute(machiningAttIterator))
+
+                    if (!feature.HasUserAttribute(machiningAttIterator))
+                    {
+                        continue;
+                    }
+
+                    if (GetTypeFromAttr(machiningAttIterator, feature).Equals(FeatureFactory.WC))
                     {
                         descModel = ProcessWCFeat(factory, feature);
-                        if (MachiningDescriptionModel.IsDescriptionSame(descModels, descModel))
+                        tmpDescModel = ProcessMachiningDescription(descModels, descModel);
+                        if (tmpDescModel != null)
                         {
-                            MachiningDescriptionModel.SumUpModelQuantity(descModels, descModel);
-                            MachiningDescriptionModel.AppendModelPoints(descModels, descModel);
+                            descModels.Add(tmpDescModel);
                         }
-                        else
+                    }
+                    else if (GetTypeFromAttr(machiningAttIterator, feature).Equals(FeatureFactory.MILL))
+                    {
+                        descModel = ProcessMillFeat(factory, feature);
+                        tmpDescModel = ProcessMachiningDescription(descModels, descModel);
+                        if (tmpDescModel != null)
                         {
-                            descModels.Add(descModel);
+                            descModels.Add(tmpDescModel);
                         }
                     }
                 }
@@ -281,26 +288,56 @@ namespace DrawingDetailingModule.Model
             return descModels;
         }
 
-        private MachiningDescriptionModel ProcessWCFeat(FeatureFactory factory, Feature feature)
-        {            
-            MachiningDescriptionModel descModel;
-            NXOpen.Features.Extrude extrude = feature as NXOpen.Features.Extrude;
-            WCPocketFeature wcFeat = factory.GetFeature(feature) as WCPocketFeature;
-            wcFeat.ufs = ufs;
-            wcFeat.GetFeatureDetailInformation(extrude);
-            wcFeat.SelectedBody = selectedBody[0];
-            
-            string description = wcFeat.ToString();
+        private MachiningDescriptionModel ProcessMachiningDescription(List<MachiningDescriptionModel> descModels, MachiningDescriptionModel descModel)
+        {
+            if (MachiningDescriptionModel.IsDescriptionSame(descModels, descModel))
+            {
+                MachiningDescriptionModel.SumUpModelQuantity(descModels, descModel);
+                MachiningDescriptionModel.AppendModelPoints(descModels, descModel);
+            }
+            else
+            {
+                return descModel;
+            }
+            return null;
+        }
 
-            List<Point3d> points = wcFeat.GenerateWCSPLocation();
+        private MachiningDescriptionModel ProcessMillFeat(FeatureFactory factory, Feature feature)
+        {
+            MillPocketFeature millFeat = factory.GetFeature(feature) as MillPocketFeature;
+            millFeat.ufs = ufs;
+            millFeat.GetFeatureDetailInformation(feature);
+            millFeat.SelectedBody = selectedBody[0];
+
+            string description = millFeat.ToString();
+
+            List<Point3d> points = millFeat.GenerateLocation();
 
             AskBoundingBox boundingBox = new AskBoundingBox(ufs, selectedBody[0].Tag);
             double[] point = new double[3] { points[0].X, points[0].Y, points[0].Z };
             string height = boundingBox.GetThickness();
+            double[] direction = boundingBox.AskDirection(point, AXIS.Z);
 
-            descModel = new MachiningDescriptionModel(description, points.Count, points, wcFeat.GetProcessAbbrevate(), boundingBox.AskDirection(point, AXIS.Z), height);
+            return new MachiningDescriptionModel(description, points.Count, points, millFeat.GetProcessAbbrevate(), direction, height);
+        }
 
-            return descModel;
+        private MachiningDescriptionModel ProcessWCFeat(FeatureFactory factory, Feature feature)
+        {
+            WCPocketFeature wcFeat = factory.GetFeature(feature) as WCPocketFeature;
+            wcFeat.ufs = ufs;
+            wcFeat.GetFeatureDetailInformation(feature);
+            wcFeat.SelectedBody = selectedBody[0];
+
+            string description = wcFeat.ToString();
+
+            List<Point3d> points = wcFeat.GenerateLocation();
+
+            AskBoundingBox boundingBox = new AskBoundingBox(ufs, selectedBody[0].Tag);
+            double[] point = new double[3] { points[0].X, points[0].Y, points[0].Z };
+            string height = boundingBox.GetThickness();
+            double[] direction = boundingBox.AskDirection(point, AXIS.Z);
+
+            return new MachiningDescriptionModel(description, points.Count, points, wcFeat.GetProcessAbbrevate(), direction, height);
         }
 
         private MachiningDescriptionModel ProcessHolePackage(FeatureFactory factory, Feature feature)
@@ -309,7 +346,7 @@ namespace DrawingDetailingModule.Model
             NXOpen.Features.HolePackage holePackage = feature as NXOpen.Features.HolePackage;
             MyHoleFeature holeFeat = factory.GetFeature(feature) as MyHoleFeature;
             holeFeat.GetFeatureDetailInformation(feature);
-            string description = holeFeat.ToString();
+            string description = holeFeat.ToString();           
 
             AskBoundingBox boundingBox = new AskBoundingBox(ufs, selectedBody[0].Tag);
 
@@ -321,7 +358,7 @@ namespace DrawingDetailingModule.Model
             descModel = new MachiningDescriptionModel(description, points.Count, points, holeFeat.GetProcessAbbrevate(), boundingBox.AskDirection(point, AXIS.Z), height);
 
             return descModel;
-        }
+        }       
 
         public void GenerateWCStartPoints(List<MachiningDescriptionModel> descriptionModels)
         {
@@ -400,6 +437,15 @@ namespace DrawingDetailingModule.Model
         public void ShowMessageBox(string title, NXMessageBox.DialogType msgboxType, string message)
         {
             ui.NXMessageBox.Show(title, msgboxType, message);
+        }
+
+        private string GetTypeFromAttr(AttributeIterator attItr, Feature feature)
+        {
+            if (feature.HasUserAttribute(attItr))
+            {
+                return feature.GetStringUserAttribute(FeatureFactory.TYPE, 0);
+            }
+            return "";
         }
 
     }

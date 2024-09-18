@@ -20,13 +20,16 @@ namespace DrawingDetailingModule.Model
         public const string TYPE = "Type";
         public const string REAM = "REAM";
         public const string WC = "WC";
+        public const string MILL = "MILL";
+        public const string MIRROR = "MIRROR";
         public const string WC_OFFSET = "wcOffset";
-        public const string WC_CONDITION = "wcCondition";
+        public const string CUT_CONDITION = "cutCondition";
         public const string EXTRUDE = "EXTRUDE";
         public const string DR = "DR";
         public const string CBORE = "C'BORE";
         public const string WC_SP = "wc sp";
         public const string DP = "DP";
+        public const string SYMBOLIC_THREAD = "SYMBOLIC_THREAD";
 
         public FeatureFactory()
         {
@@ -45,25 +48,47 @@ namespace DrawingDetailingModule.Model
             {
                 case THREADED:
                     return new Threaded2(holePackage);
-                case COUNTERBORED:                    
+                case COUNTERBORED:
                     return CounterBoreClassification(feature, iterator);
                 case SIMPLE:
                     return SimpleHoleClassification(feature, iterator);
                 case DRILL:
                     return new SimpleHole2(holePackage);
                 case EXTRUDE:
-                    return new WCPocketFeature(feature);
+                    return PocketFeatureClassification(feature, iterator);                
+
                 default:
                     throw new ArgumentNullException($"Error on: {processType}");
             }
 
         }
 
-        private static MyFeature SimpleHoleClassification(Feature feature, AttributeIterator iterator)
+        private MyFeature PocketFeatureClassification(Feature feature, AttributeIterator iterator)
+        {
+            string type;
+            if (!feature.HasUserAttribute(iterator))
+            {
+                throw new ArgumentNullException($"Error on: PocketFeatureClassifiction, no Type Value in Attribute.");
+            }
+
+            type = feature.GetStringUserAttribute(TYPE, 0);
+
+            if (type.Equals(FeatureFactory.WC, StringComparison.OrdinalIgnoreCase))
+            {
+                return new WCPocketFeature(feature);
+            }
+            else if (type.Equals(FeatureFactory.MILL, StringComparison.OrdinalIgnoreCase))
+            {
+                return new MillPocketFeature(feature);
+            }
+            throw new ArgumentNullException($"Error on: PocketFeatureClassifiction, Type Value is arbitrary.");
+        }
+
+        private MyFeature SimpleHoleClassification(Feature feature, AttributeIterator iterator)
         {
             HolePackage holePackage = feature as HolePackage;
             string type;
-            
+
             if (!feature.HasUserAttribute(iterator))
             {
                 return new SimpleHole2(holePackage);
@@ -80,7 +105,7 @@ namespace DrawingDetailingModule.Model
         }
 
         private MyFeature CounterBoreClassification(Feature feature, AttributeIterator iterator)
-        {            
+        {
             if (!feature.HasUserAttribute(iterator))
             {
                 return new Counterbore2(feature);

@@ -15,6 +15,7 @@ namespace DrawingDetailingModule.Model
         protected Part workPart;
         protected UFSession ufs;
         protected List<Point3d> points;
+        public Feature feature { get; set; }
 
         public int Quantity { get; set; }
 
@@ -22,7 +23,8 @@ namespace DrawingDetailingModule.Model
         {
             workPart = Session.GetSession().Parts.Work;
             points = new List<Point3d>();
-            ufs = UFSession.GetUFSession();            
+            ufs = UFSession.GetUFSession();
+            this.feature = feature;
         }
 
         public MyFeature()
@@ -57,12 +59,24 @@ namespace DrawingDetailingModule.Model
         {
             AttributeIterator iterator = workPart.CreateAttributeIterator();
 
-            iterator.SetIncludeOnlyTitle(FeatureFactory.WC_CONDITION);
+            iterator.SetIncludeOnlyTitle(FeatureFactory.CUT_CONDITION);
             if (feature.HasUserAttribute(iterator))
             {
-                return feature.GetStringUserAttribute(FeatureFactory.WC_CONDITION, 0);
+                return feature.GetStringUserAttribute(FeatureFactory.CUT_CONDITION, 0);
             }
             return @"S\C";
+        }
+        
+        public string GetMILLCondition(Feature feature)
+        {
+            AttributeIterator iterator = workPart.CreateAttributeIterator();
+
+            iterator.SetIncludeOnlyTitle(FeatureFactory.CUT_CONDITION);
+            if (feature.HasUserAttribute(iterator))
+            {
+                return feature.GetStringUserAttribute(FeatureFactory.CUT_CONDITION, 0);
+            }
+            return "TO SIZE";
         }
 
         public string GetWCOffset(Feature feature)

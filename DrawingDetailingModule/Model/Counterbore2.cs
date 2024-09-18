@@ -13,11 +13,16 @@ namespace DrawingDetailingModule.Model
     {
         public double CounterboreDiamter { get; set; }
         public double CounterDepth { get; set; }
+        public List<SymbolicThread> symbolicThreads { get; set; }
         public Counterbore2(Feature feature) : base(feature)
         {
+            symbolicThreads = new List<SymbolicThread>();
         }
 
-        public Counterbore2() { }
+        public Counterbore2() 
+        {
+            symbolicThreads = new List<SymbolicThread>();
+        }
 
         private bool AskThruHole(HolePackage hole)
         {
@@ -39,6 +44,12 @@ namespace DrawingDetailingModule.Model
             string depth = IsThruHole ? "THRU" : $"{HoleDepth:F1}";
             string description = $"{GetProcessAbbrevate()} <o>{CounterboreDiamter:F1} {FeatureFactory.DP} {CounterDepth:F1}, " +
                 $"{FeatureFactory.DR} <o>{HoleDiameter:F1} {depth}";
+
+            // Append the description
+            if (symbolicThreads.Count > 0) 
+            {
+                symbolicThreads.ForEach(x => description += $", TAP M{x.MajorDiameter}x{x.Pitch} DP {x.Length}");
+            }
             
             return description;            
         }
@@ -46,15 +57,36 @@ namespace DrawingDetailingModule.Model
         public override string GetProcessAbbrevate() => "C'BORE";
 
         public override void GetFeatureDetailInformation(Feature feature)
-        {
+        {            
             HolePackage holePackage = feature as HolePackage;
             HolePackageBuilder hpBuilder = workPart.Features.CreateHolePackageBuilder(holePackage);
             CounterboreDiamter = hpBuilder.ScrewClearanceCounterboreDiameter.Value;
             HoleDiameter = hpBuilder.ScrewClearanceHoleDiameter.Value;
             CounterDepth = hpBuilder.ScrewClearanceCounterboreDepth.Value;
+            HoleDepth = hpBuilder.ScrewClearanceHoleDepth.Value;
             Quantity = points.Count;
             TaggedObject taggedObject = NXOpen.Utilities.NXObjectManager.Get(holePackage.Tag);
             IsThruHole = AskThruHole(holePackage);
+
+            Feature[] allChilds = holePackage.GetAllChildren();
+            System.Diagnostics.Debugger.Launch();
+            if (allChilds.Length > 0)
+            {
+                foreach (Feature child in allChilds)
+                {                    
+                    SymbolicThread symbolicThreadcs = new SymbolicThread();
+                    if (!symbolicThreadcs.IsSymbolicThreads(child))
+                    {
+                        continue;
+                    }
+                    if(!symbolicThreadcs.IsContains(symbolicThreads, symbolicThreadcs))
+                    {
+                        symbolicThreads.Add(symbolicThreadcs);
+                    }
+                }
+                
+
+            }
         }  
     }
 

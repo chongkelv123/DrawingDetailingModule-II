@@ -9,54 +9,17 @@ using System.Threading.Tasks;
 
 namespace DrawingDetailingModule.Model
 {
-    public class WCPocketFeature : MyFeature
-    {
-        Extrude extrureFeat;
-        Feature sketchFeat;
+    public class WCPocketFeature : MyPocketFeature
+    {        
         List<Point3d> wcspBasePoint;
-        public UFSession ufs { get; set; }
         
-        public TaggedObject SelectedBody { get; set; }
+        public double WCStartPointDiameter { get; set; } 
 
-        Feature feature;
-        public double WCStartPointDiamter { get; set; }
-
-        public WCPocketFeature()
-        {
-        }
-
-        public WCPocketFeature(Feature feature) : base(feature)
-        {
-            this.feature = feature;
-            extrureFeat = feature as Extrude;
-            sketchFeat = GetSketchFeat(feature);            
-        }
-
-        private Feature GetSketchFeat(Feature feature)
-        {
-            Feature result = null;
-            foreach (NXObject ent in feature.GetParents())
-            {
-                if (ent is SketchFeature)
-                {
-                    return (SketchFeature)ent;
-                }
-                else if (ent is WaveSketch)
-                {
-                    return (WaveSketch)ent;
-                }
-            }
-            return result;
-        }
-
-        public override void GetFeatureDetailInformation(Feature feature)
-        {
-            Quantity = 1;
-        }
+        public WCPocketFeature(Feature feature) : base(feature) {}              
 
         public override string GetProcessAbbrevate() => FeatureFactory.WC;
 
-        public List<Point3d> GenerateWCSPLocation()
+        public override List<Point3d> GenerateLocation()
         {
             List<Point3d> points = new List<Point3d>();
 
@@ -100,27 +63,7 @@ namespace DrawingDetailingModule.Model
             wcspBasePoint = points;
 
             return points;
-        }
-
-        private Point3d calculateMidPoint(Line line)
-        {
-            double midX = (line.StartPoint.X + line.EndPoint.X) / 2;
-            double midY = (line.StartPoint.Y + line.EndPoint.Y) / 2;
-            double midZ = (line.StartPoint.Z + line.EndPoint.Z) / 2;
-
-            return new Point3d(midX, midY, midZ);
-        }
-
-        private double CalculateLineLength(Line line)
-        {
-            double length = Math.Sqrt(
-                Math.Pow(line.EndPoint.X - line.StartPoint.X, 2) +
-                Math.Pow(line.EndPoint.Y - line.StartPoint.Y, 2) +
-                Math.Pow(line.EndPoint.Z - line.StartPoint.Z, 2)
-                );
-
-            return length;
-        }
+        }        
 
         public static Point3d OffsetPerpendicular(Line line, Point3d midPoint, double offsetDistance, bool flip)
         {
@@ -169,9 +112,9 @@ namespace DrawingDetailingModule.Model
         {
             string wcType = GetWCCondition(feature);
             string wcOffset = GetWCOffset(feature);
-            WCStartPointDiamter = GetWCStartPointDiam(35.0);
+            WCStartPointDiameter = GetWCStartPointDiam(35.0);
 
-            string description = $"PROF {GetProcessAbbrevate()} {wcOffset} {wcType} (<o>{WCStartPointDiamter:F1} {FeatureFactory.WC_SP})";
+            string description = $"PROF {GetProcessAbbrevate()} {wcOffset} {wcType} (<o>{WCStartPointDiameter:F1} {FeatureFactory.WC_SP})";
 
             return description;
         }
@@ -183,6 +126,11 @@ namespace DrawingDetailingModule.Model
                 return 3.0;
             }
             return 5.2;
+        }
+
+        public override void GetFeatureDetailInformation(Feature feature)
+        {
+            Quantity = 1;
         }
     }
 }

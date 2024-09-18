@@ -17,8 +17,8 @@ namespace DrawingDetailingModule.Model
         }
 
         string processAbbrevate;
-        public override string GetProcessAbbrevate() => "DR";        
-        
+        public override string GetProcessAbbrevate() => "DR";
+
         public override void GetFeatureDetailInformation(Feature feature)
         {
             HolePackage holePackage = feature as HolePackage;
