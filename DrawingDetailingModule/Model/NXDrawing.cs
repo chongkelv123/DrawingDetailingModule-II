@@ -145,19 +145,14 @@ namespace DrawingDetailingModule.Model
             ufs.Tabnot.SetCellText(cell, "QTY");
             ufs.Tabnot.SetColumnWidth(column, 60);
 
-            int numOfColumn = 3;
-            int numOfSkipAlp = 0;
-            int tempInt = 0;
+            int numOfColumn = 3;        
 
             for (int i = 0; i < descriptionModels.Count; i++)
             {
                 ufs.Tabnot.AskNthRow(tabNote, i + 1, out row);
 
                 PlaceAnnotation(descriptionModels[i].Points, NumberToAlphabet(i));
-                //if (tempInt > 0)
-                //{
-                //    numOfSkipAlp = tempInt;
-                //}
+            
                 for (int j = 0; j < numOfColumn; j++)
                 {
                     ufs.Tabnot.AskNthColumn(tabNote, j, out column);
@@ -191,37 +186,7 @@ namespace DrawingDetailingModule.Model
                 AnnotationManager manager = workPart.Annotations;
                 Note note = manager.CreateNote(text_string, point, AxisOrientation.Horizontal, null, null);
             }
-        }
-
-        //public string NumberToAlphabet(int number, out int numberOfSkipAlphabet)
-        //{
-        //    int asciiDec = 65;
-        //    numberOfSkipAlphabet = 0;
-        //    char c;
-        //    StringBuilder stringBuilder = new StringBuilder();
-
-        //    asciiDec += number;
-        //    if (asciiDec == 73 || asciiDec == 79) // Skip alphabet I or Skip alphabet O
-        //    {
-        //        numberOfSkipAlphabet++;
-        //        asciiDec += numberOfSkipAlphabet;
-        //    }
-
-        //    if (asciiDec <= 90)
-        //    {
-        //        c = (char)asciiDec;
-        //        stringBuilder.Append(c);
-        //    }
-        //    else
-        //    {
-        //        c = (char)asciiDec;
-        //        stringBuilder.Append(c);
-        //        char d = (char)(number - 26);
-        //        stringBuilder.Append(d);
-        //    }
-
-        //    return stringBuilder.ToString();
-        //}
+        }        
 
         public string NumberToAlphabet (int number)
         {
