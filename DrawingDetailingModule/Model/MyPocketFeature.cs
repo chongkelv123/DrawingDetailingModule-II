@@ -36,9 +36,13 @@ namespace DrawingDetailingModule.Model
                 {
                     return (WaveSketch)ent;
                 }
+                else if (ent is ProjectCurve)
+                {
+                    return (ProjectCurve)ent;
+                }
             }
             return result;
-        }        
+        }
 
         public Point3d calculateMidPoint(Line line)
         {

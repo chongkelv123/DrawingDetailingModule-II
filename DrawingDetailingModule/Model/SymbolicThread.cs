@@ -28,8 +28,6 @@ namespace DrawingDetailingModule.Model
         const string MINOR_DIAMETER = "Minor Diameter";
         const string TAPPED_DRILL_SIZE = "Tapped Drill Size";
 
-
-
         Feature feature;
 
         public SymbolicThread() { }
@@ -47,8 +45,7 @@ namespace DrawingDetailingModule.Model
         }
 
         private void processThreadInfo()
-        {
-            //System.Diagnostics.Debugger.Launch();
+        {            
             var exprs = feature.GetExpressions();
             if (exprs == null)
             {

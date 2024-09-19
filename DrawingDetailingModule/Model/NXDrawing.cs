@@ -38,6 +38,10 @@ namespace DrawingDetailingModule.Model
         public bool IsFaceSelected => selectedBody.Count > 0;
         public bool IsPointLocated => locatedPoint.Count > 0;
 
+        public NXDrawing()
+        {
+        }
+
         public NXDrawing(Controller.Control control)
         {
             session = Session.GetSession();
@@ -149,18 +153,18 @@ namespace DrawingDetailingModule.Model
             {
                 ufs.Tabnot.AskNthRow(tabNote, i + 1, out row);
 
-                PlaceAnnotation(descriptionModels[i].Points, NumberToAlphabet(i + numOfSkipAlp, out tempInt));
-                if (tempInt > 0)
-                {
-                    numOfSkipAlp = tempInt;
-                }
+                PlaceAnnotation(descriptionModels[i].Points, NumberToAlphabet(i));
+                //if (tempInt > 0)
+                //{
+                //    numOfSkipAlp = tempInt;
+                //}
                 for (int j = 0; j < numOfColumn; j++)
                 {
                     ufs.Tabnot.AskNthColumn(tabNote, j, out column);
                     ufs.Tabnot.AskCellAtRowCol(row, column, out cell);
                     if (j == 0)
                     {
-                        ufs.Tabnot.SetCellText(cell, NumberToAlphabet(i + numOfSkipAlp, out tempInt));
+                        ufs.Tabnot.SetCellText(cell, NumberToAlphabet(i));
                     }
                     else if (j == 1)
                     {
@@ -189,34 +193,53 @@ namespace DrawingDetailingModule.Model
             }
         }
 
-        public string NumberToAlphabet(int number, out int numberOfSkipAlphabet)
+        //public string NumberToAlphabet(int number, out int numberOfSkipAlphabet)
+        //{
+        //    int asciiDec = 65;
+        //    numberOfSkipAlphabet = 0;
+        //    char c;
+        //    StringBuilder stringBuilder = new StringBuilder();
+
+        //    asciiDec += number;
+        //    if (asciiDec == 73 || asciiDec == 79) // Skip alphabet I or Skip alphabet O
+        //    {
+        //        numberOfSkipAlphabet++;
+        //        asciiDec += numberOfSkipAlphabet;
+        //    }
+
+        //    if (asciiDec <= 90)
+        //    {
+        //        c = (char)asciiDec;
+        //        stringBuilder.Append(c);
+        //    }
+        //    else
+        //    {
+        //        c = (char)asciiDec;
+        //        stringBuilder.Append(c);
+        //        char d = (char)(number - 26);
+        //        stringBuilder.Append(d);
+        //    }
+
+        //    return stringBuilder.ToString();
+        //}
+
+        public string NumberToAlphabet (int number)
         {
-            int asciiDec = 65;
-            numberOfSkipAlphabet = 0;
-            char c;
-            StringBuilder stringBuilder = new StringBuilder();
-
-            asciiDec += number;
-            if (asciiDec == 73 || asciiDec == 79) // Skip alphabet I or Skip alphabet O
+            StringBuilder result = new StringBuilder();
+            int baseValue = 24; // 26 letters - 2 skipped letters (I and O)
+            while (number >= 0)
             {
-                numberOfSkipAlphabet++;
-                asciiDec += numberOfSkipAlphabet;
-            }
+                int remainder = number % baseValue;
+                char letter = (char)(remainder + 'A');
 
-            if (asciiDec <= 90)
-            {
-                c = (char)asciiDec;
-                stringBuilder.Append(c);
-            }
-            else
-            {
-                c = (char)asciiDec;
-                stringBuilder.Append(c);
-                char d = (char)(number - 26);
-                stringBuilder.Append(d);
-            }
+                // Adjust for skipped letters
+                if (letter >= 'I') letter++;
+                if (letter >= 'O') letter++;
 
-            return stringBuilder.ToString();
+                result.Insert(0, letter);
+                number = (number / baseValue) - 1;
+            }
+            return result.ToString();
         }
 
         public void SetTextSize(double currentTextSize)

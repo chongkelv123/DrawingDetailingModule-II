@@ -68,13 +68,12 @@ namespace DrawingDetailingModule.Model
             TaggedObject taggedObject = NXOpen.Utilities.NXObjectManager.Get(holePackage.Tag);
             IsThruHole = AskThruHole(holePackage);
 
-            Feature[] allChilds = holePackage.GetAllChildren();
-            System.Diagnostics.Debugger.Launch();
+            Feature[] allChilds = holePackage.GetAllChildren();            
             if (allChilds.Length > 0)
             {
                 foreach (Feature child in allChilds)
                 {                    
-                    SymbolicThread symbolicThreadcs = new SymbolicThread();
+                    SymbolicThread symbolicThreadcs = new SymbolicThread();                                        
                     if (!symbolicThreadcs.IsSymbolicThreads(child))
                     {
                         continue;

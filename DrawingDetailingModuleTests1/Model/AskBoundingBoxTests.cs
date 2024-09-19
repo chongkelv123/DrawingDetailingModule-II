@@ -14,7 +14,7 @@ namespace DrawingDetailingModule.Model.Tests
         [TestMethod()]
         public void IsFromBackDirection_WhenYValueIsMaxInY_ReturnsTrue()
         {
-            // Arrange        
+            // Arrange
             AskBoundingBox askBounding = new AskBoundingBox();
             askBounding.MinX = 0;
             askBounding.MinY = 0;
@@ -108,7 +108,7 @@ namespace DrawingDetailingModule.Model.Tests
             // Assert
             CollectionAssert.AreEqual(expected, result);
         }
-        
+
         [TestMethod()]
         public void AskDirectionTest_ZvalueInTheMiddle_ReturnTrue()
         {

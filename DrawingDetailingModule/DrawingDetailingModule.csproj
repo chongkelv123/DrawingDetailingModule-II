@@ -71,7 +71,6 @@
     <Compile Include="Model\FeatureFactory.cs" />
     <Compile Include="Model\IFeature.cs" />
     <Compile Include="Model\IMyWCFeature.cs" />
-    <Compile Include="Model\InstanceFeature.cs" />
     <Compile Include="Model\MachiningDescriptionModel.cs" />
     <Compile Include="Model\MillPocketFeature.cs" />
     <Compile Include="Model\MyFeature.cs" />

@@ -30,6 +30,7 @@ namespace DrawingDetailingModule.Model
         public const string WC_SP = "wc sp";
         public const string DP = "DP";
         public const string SYMBOLIC_THREAD = "SYMBOLIC_THREAD";
+        public const string PATTERN = "Pattern";
 
         public FeatureFactory()
         {
