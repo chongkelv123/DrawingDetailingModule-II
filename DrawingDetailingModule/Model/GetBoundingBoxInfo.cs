@@ -39,11 +39,30 @@ namespace DrawingDetailingModule.Model
                     NXOpen.Arc arc = (NXOpen.Arc)ent;
                     double radius = arc.Radius;
                     Point3d centerPt = arc.CenterPoint;
-                    pointCollection.Add(centerPt);
-                    pointCollection.Add(new Point3d(centerPt.X + radius, centerPt.Y, centerPt.Z));
-                    pointCollection.Add(new Point3d(centerPt.X - radius, centerPt.Y, centerPt.Z));
-                    pointCollection.Add(new Point3d(centerPt.X, centerPt.Y + radius, centerPt.Z));
-                    pointCollection.Add(new Point3d(centerPt.X, centerPt.Y - radius, centerPt.Z));
+
+                    double startAngleRad = arc.StartAngle * (Math.PI / 180.0);
+                    double endAngleRad = arc.EndAngle * (Math.PI / 180.0);
+
+                    Point3d startPoint = new Point3d(
+                    centerPt.X + radius * Math.Cos(startAngleRad),
+                    centerPt.Y + radius * Math.Sin(startAngleRad),
+                    centerPt.Z
+                    );
+
+                    Point3d endPoint = new Point3d(
+                    centerPt.X + radius * Math.Cos(endAngleRad),
+                    centerPt.Y + radius * Math.Sin(endAngleRad),
+                    centerPt.Z
+                    );
+
+                    pointCollection.Add( startPoint );
+                    pointCollection.Add( endPoint );
+
+                    //pointCollection.Add(centerPt);
+                    //pointCollection.Add(new Point3d(centerPt.X + radius, centerPt.Y, centerPt.Z));
+                    //pointCollection.Add(new Point3d(centerPt.X - radius, centerPt.Y, centerPt.Z));
+                    //pointCollection.Add(new Point3d(centerPt.X, centerPt.Y + radius, centerPt.Z));
+                    //pointCollection.Add(new Point3d(centerPt.X, centerPt.Y - radius, centerPt.Z));
 
                 }
                 else if (ent is NXOpen.Line)
@@ -111,13 +130,13 @@ namespace DrawingDetailingModule.Model
             {
                 return false;
             }
-        }     
+        }
 
         private void CreateExtrusion()
         {
             Part workPart = Session.GetSession().Parts.Work;
             BoundedPlaneBuilder boundedPlane = workPart.Features.CreateBoundedPlaneBuilder(null);
-            SelectionIntentRule[] rule1 = new SelectionIntentRule[1];            
+            SelectionIntentRule[] rule1 = new SelectionIntentRule[1];
 
             boundedPlane.CommitFeature();
         }
