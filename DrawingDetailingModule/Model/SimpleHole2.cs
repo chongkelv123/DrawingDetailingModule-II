@@ -56,9 +56,17 @@ namespace DrawingDetailingModule.Model
 
         public override string ToString()
         {
+            string holeCondition = GetHoleCondition(feature);
             string depth = IsThruHole ? "THRU" : $"DP {HoleDepth:F1}";
-            string result = $"{processAbbrevate} <o>{HoleDiameter:F1} {depth}";
-
+            string result = "";
+            if (holeCondition == "")
+            {
+                result = $"{processAbbrevate} <o>{HoleDiameter:F1} {depth}";
+            }
+            else
+            {
+                result = $"{processAbbrevate} <o>{HoleDiameter:F1} {depth} {holeCondition}";
+            }
             return result;
         }
 

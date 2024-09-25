@@ -8,7 +8,7 @@ using NXOpen.Features;
 using NXOpen.UF;
 
 namespace DrawingDetailingModule.Model
-{    
+{
     public class Counterbore2 : MyHoleFeature
     {
         public double CounterboreDiamter { get; set; }
@@ -19,7 +19,7 @@ namespace DrawingDetailingModule.Model
             symbolicThreads = new List<SymbolicThread>();
         }
 
-        public Counterbore2() 
+        public Counterbore2()
         {
             symbolicThreads = new List<SymbolicThread>();
         }
@@ -41,23 +41,34 @@ namespace DrawingDetailingModule.Model
 
         public override string ToString()
         {
+            string cboreCondition = GetHoleCondition(feature);
             string depth = IsThruHole ? "THRU" : $"{HoleDepth:F1}";
-            string description = $"{GetProcessAbbrevate()} <o>{CounterboreDiamter:F1} {FeatureFactory.DP} {CounterDepth:F1}, " +
+            string description = "";
+            if (cboreCondition == "")
+            {
+                description = $"{GetProcessAbbrevate()} <o>{CounterboreDiamter:F1} {FeatureFactory.DP} {CounterDepth:F1}, " +
                 $"{FeatureFactory.DR} <o>{HoleDiameter:F1} {depth}";
+            }
+            else
+            {
+                description = $"{GetProcessAbbrevate()} <o>{CounterboreDiamter:F2} {FeatureFactory.DP} {CounterDepth:F2}, {cboreCondition}, " +
+                $"{FeatureFactory.DR} <o>{HoleDiameter:F1} {depth}";
+            }
+
 
             // Append the description
-            if (symbolicThreads.Count > 0) 
+            if (symbolicThreads.Count > 0)
             {
                 symbolicThreads.ForEach(x => description += $", TAP M{x.MajorDiameter}x{x.Pitch} DP {x.Length}");
             }
-            
-            return description;            
+
+            return description;
         }
 
         public override string GetProcessAbbrevate() => "C'BORE";
 
         public override void GetFeatureDetailInformation(Feature feature)
-        {            
+        {
             HolePackage holePackage = feature as HolePackage;
             HolePackageBuilder hpBuilder = workPart.Features.CreateHolePackageBuilder(holePackage);
             CounterboreDiamter = hpBuilder.ScrewClearanceCounterboreDiameter.Value;
@@ -68,25 +79,25 @@ namespace DrawingDetailingModule.Model
             TaggedObject taggedObject = NXOpen.Utilities.NXObjectManager.Get(holePackage.Tag);
             IsThruHole = AskThruHole(holePackage);
 
-            Feature[] allChilds = holePackage.GetAllChildren();            
+            Feature[] allChilds = holePackage.GetAllChildren();
             if (allChilds.Length > 0)
             {
                 foreach (Feature child in allChilds)
-                {                    
-                    SymbolicThread symbolicThreadcs = new SymbolicThread();                                        
+                {
+                    SymbolicThread symbolicThreadcs = new SymbolicThread();
                     if (!symbolicThreadcs.IsSymbolicThreads(child))
                     {
                         continue;
                     }
-                    if(!symbolicThreadcs.IsContains(symbolicThreads, symbolicThreadcs))
+                    if (!symbolicThreadcs.IsContains(symbolicThreads, symbolicThreadcs))
                     {
                         symbolicThreads.Add(symbolicThreadcs);
                     }
                 }
-                
+
 
             }
-        }  
+        }
     }
 
 }

@@ -64,7 +64,7 @@ namespace DrawingDetailingModule.Model
             {
                 return feature.GetStringUserAttribute(FeatureFactory.CUT_CONDITION, 0);
             }
-            return @"S\C";
+            return @"S/C";
         }
         
         public string GetMILLCondition(Feature feature)
@@ -77,6 +77,18 @@ namespace DrawingDetailingModule.Model
                 return feature.GetStringUserAttribute(FeatureFactory.CUT_CONDITION, 0);
             }
             return "TO SIZE";
+        }
+        
+        public string GetHoleCondition(Feature feature)
+        {
+            AttributeIterator iterator = workPart.CreateAttributeIterator();
+
+            iterator.SetIncludeOnlyTitle(FeatureFactory.CUT_CONDITION);
+            if (feature.HasUserAttribute(iterator))
+            {
+                return feature.GetStringUserAttribute(FeatureFactory.CUT_CONDITION, 0);
+            }
+            return "";
         }
 
         public string GetWCOffset(Feature feature)
