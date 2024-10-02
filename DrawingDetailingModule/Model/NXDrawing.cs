@@ -15,6 +15,12 @@ using NXOpen.CAE.Connections;
 
 namespace DrawingDetailingModule.Model
 {
+    public enum FaceColor
+    {
+        WCSP = 55,
+        MILL = 211,
+        WC = 181,
+    }
     public class NXDrawing
     {
         Session session;
@@ -116,7 +122,7 @@ namespace DrawingDetailingModule.Model
 
             pmiTableBuilder.Origin.OriginPoint = insertionPoint;
 
-            NXObject tableObj = pmiTableBuilder.Commit();
+            NXObject tableObj = pmiTableBuilder.Commit(); 
 
             TableSection table = tableObj as TableSection;
 

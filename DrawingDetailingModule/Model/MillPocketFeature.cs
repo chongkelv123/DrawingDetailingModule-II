@@ -37,7 +37,7 @@ namespace DrawingDetailingModule.Model
             Point3d midPoint = getBounding.MidPoint;
 
             return new List<Point3d>() { midPoint };
-        }
+        }        
 
         public override void GetFeatureDetailInformation(Feature feature)
         {            

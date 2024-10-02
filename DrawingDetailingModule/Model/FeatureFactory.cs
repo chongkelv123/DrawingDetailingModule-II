@@ -15,6 +15,7 @@ namespace DrawingDetailingModule.Model
         public const string THREADED = "THREADED";
         public const string DRILL = "DRILL";
         public const string COUNTERBORED = "COUNTERBORED";
+        public const string COUNTERSUNK = "COUNTERSUNK";
         public const string SIMPLE = "SIMPLE";
         public const string MACHINING = "Machining";
         public const string TYPE = "Type";
@@ -37,7 +38,7 @@ namespace DrawingDetailingModule.Model
         }
 
         public MyFeature GetFeature(Feature feature)
-        {
+        {            
             string processType = MyFeature.GetProcessType(feature);
             HolePackage holePackage = feature as HolePackage;
 
@@ -56,8 +57,9 @@ namespace DrawingDetailingModule.Model
                 case DRILL:
                     return new SimpleHole2(holePackage);
                 case EXTRUDE:
-                    return PocketFeatureClassification(feature, iterator);                
-
+                    return PocketFeatureClassification(feature, iterator);
+                case COUNTERSUNK:
+                    return new CounterSunk(feature);
                 default:
                     throw new ArgumentNullException($"Error on: {processType}");
             }

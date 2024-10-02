@@ -13,15 +13,15 @@ namespace DrawingDetailingModule.Model
     {
         public double CounterboreDiamter { get; set; }
         public double CounterDepth { get; set; }
-        public List<SymbolicThread> symbolicThreads { get; set; }
+        public List<SymbolicThread> SymbolicThreads { get; set; }
         public Counterbore2(Feature feature) : base(feature)
         {
-            symbolicThreads = new List<SymbolicThread>();
+            SymbolicThreads = new List<SymbolicThread>();
         }
 
         public Counterbore2()
         {
-            symbolicThreads = new List<SymbolicThread>();
+            SymbolicThreads = new List<SymbolicThread>();
         }
 
         private bool AskThruHole(HolePackage hole)
@@ -35,7 +35,7 @@ namespace DrawingDetailingModule.Model
             int thru_flag;
             TaggedObject taggedObject = NXOpen.Utilities.NXObjectManager.Get(hole.Tag);
             ufs.Modl.AskCBoreHoleParms(taggedObject.Tag, edit, out diameter1, out diameter2, out depth1, out depth2, out tip_angle, out thru_flag);
-
+            
             return thru_flag == 1;
         }
 
@@ -55,11 +55,11 @@ namespace DrawingDetailingModule.Model
                 $"{FeatureFactory.DR} <o>{HoleDiameter:F1} {depth}";
             }
 
-
             // Append the description
-            if (symbolicThreads.Count > 0)
+            if (SymbolicThreads.Count > 0)
             {
-                symbolicThreads.ForEach(x => description += $", TAP M{x.MajorDiameter}x{x.Pitch} DP {x.Length}");
+                SymbolicThread x = SymbolicThreads[0];
+                description += $", TAP M{x.MajorDiameter}x{x.Pitch} DP {x.Length:F1}";
             }
 
             return description;
@@ -80,24 +80,8 @@ namespace DrawingDetailingModule.Model
             IsThruHole = AskThruHole(holePackage);
 
             Feature[] allChilds = holePackage.GetAllChildren();
-            if (allChilds.Length > 0)
-            {
-                foreach (Feature child in allChilds)
-                {
-                    SymbolicThread symbolicThreadcs = new SymbolicThread();
-                    if (!symbolicThreadcs.IsSymbolicThreads(child))
-                    {
-                        continue;
-                    }
-                    if (!symbolicThreadcs.IsContains(symbolicThreads, symbolicThreadcs))
-                    {
-                        symbolicThreads.Add(symbolicThreadcs);
-                    }
-                }
-
-
-            }
-        }
+            SymbolicThreads = GetSymbolicThread(allChilds, SymbolicThreads);
+        }        
     }
 
 }

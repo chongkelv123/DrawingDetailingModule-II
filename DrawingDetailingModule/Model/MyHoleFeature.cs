@@ -37,7 +37,27 @@ namespace DrawingDetailingModule.Model
         {
             return points;
         }
-        
+        public List<SymbolicThread> GetSymbolicThread(Feature[] allChilds, List<SymbolicThread> SymbolicThreads)
+        {
+            List<SymbolicThread> result = new List<SymbolicThread>();
+            if (allChilds.Length > 0)
+            {
+                foreach (Feature child in allChilds)
+                {
+                    SymbolicThread symbolicThread = new SymbolicThread();
+                    if (!symbolicThread.IsSymbolicThreads(child))
+                    {
+                        continue;
+                    }
+                    if (!symbolicThread.IsContains(SymbolicThreads, symbolicThread))
+                    {
+                        result.Add(symbolicThread);
+                    }
+                }
+            }
+            return result;
+        }
+
 
     }
 }
