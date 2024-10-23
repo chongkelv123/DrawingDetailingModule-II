@@ -38,7 +38,7 @@ namespace DrawingDetailingModule.Model
             return points;
         }
         public List<SymbolicThread> GetSymbolicThread(Feature[] allChilds, List<SymbolicThread> SymbolicThreads)
-        {
+        {            
             List<SymbolicThread> result = new List<SymbolicThread>();
             if (allChilds.Length > 0)
             {
@@ -49,7 +49,7 @@ namespace DrawingDetailingModule.Model
                     {
                         continue;
                     }
-                    if (!symbolicThread.IsContains(SymbolicThreads, symbolicThread))
+                    if (!symbolicThread.IsContains(result, symbolicThread))
                     {
                         result.Add(symbolicThread);
                     }

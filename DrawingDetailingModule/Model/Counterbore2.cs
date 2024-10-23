@@ -40,7 +40,7 @@ namespace DrawingDetailingModule.Model
         }
 
         public override string ToString()
-        {
+        {                        
             string cboreCondition = GetHoleCondition(feature);
             string depth = IsThruHole ? "THRU" : $"{HoleDepth:F1}";
             string description = "";
@@ -57,9 +57,12 @@ namespace DrawingDetailingModule.Model
 
             // Append the description
             if (SymbolicThreads.Count > 0)
-            {
-                SymbolicThread x = SymbolicThreads[0];
-                description += $", TAP M{x.MajorDiameter}x{x.Pitch} DP {x.Length:F1}";
+            {                
+                foreach (SymbolicThread t in SymbolicThreads)
+                {
+                    description += $", TAP M{t.MajorDiameter}x{t.Pitch} DP {t.Length:F1}";
+                }
+                
             }
 
             return description;
