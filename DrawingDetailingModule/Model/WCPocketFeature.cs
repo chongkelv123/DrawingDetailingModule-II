@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NXOpen.GeometricUtilities;
 
 namespace DrawingDetailingModule.Model
 {
@@ -13,7 +14,9 @@ namespace DrawingDetailingModule.Model
     {        
         List<Point3d> wcspBasePoint;
         
-        public double WCStartPointDiameter { get; set; } 
+        public double WCStartPointDiameter { get; set; }
+        public double Depth { get; set; }
+        public bool IsThru { get; set; }
 
         public WCPocketFeature(Feature feature) : base(feature) {}              
 
@@ -111,12 +114,25 @@ namespace DrawingDetailingModule.Model
         public override string ToString()
         {
             string wcType = GetWCCondition(feature);
+            wcType = ProcessWCType(wcType);
             string wcOffset = GetWCOffset(feature);
             WCStartPointDiameter = GetWCStartPointDiam(35.0);
 
             string description = $"PROF {GetProcessAbbrevate()} {wcOffset} {wcType} (<o>{WCStartPointDiameter:F1} {FeatureFactory.WC_SP})";
 
             return description;
+        }
+
+        private string ProcessWCType(string wcType)
+        {
+            if(!wcType.Equals("T/C", StringComparison.OrdinalIgnoreCase))
+            {
+                return wcType;
+            }
+            StringBuilder sb = new StringBuilder();
+            sb.Append(wcType);
+            sb.Append($" (L={Depth}, T=1<$s>)");
+            return sb.ToString();
         }
 
         public double GetWCStartPointDiam(double plateThickness)
@@ -130,6 +146,16 @@ namespace DrawingDetailingModule.Model
 
         public override void GetFeatureDetailInformation(Feature feature)
         {
+            ExtrudeBuilder extrudeBuilder = workPart.Features.CreateExtrudeBuilder(feature);
+            var trimType = extrudeBuilder.Limits.EndExtend.TrimType;
+            if (trimType is NXOpen.GeometricUtilities.Extend.ExtendType.ThroughAll)
+            {
+                IsThru = true;
+            }
+            else if (trimType is Extend.ExtendType.Value)
+            {
+                Depth = extrudeBuilder.Limits.EndExtend.Value.Value;
+            }
             Quantity = 1;
         }
     }

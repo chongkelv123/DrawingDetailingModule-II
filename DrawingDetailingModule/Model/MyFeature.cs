@@ -78,6 +78,17 @@ namespace DrawingDetailingModule.Model
             }
             return "TO SIZE";
         }
+        public string GetTAPECondition(Feature feature)
+        {
+            AttributeIterator iterator = workPart.CreateAttributeIterator();
+
+            iterator.SetIncludeOnlyTitle(FeatureFactory.CUT_CONDITION);
+            if (feature.HasUserAttribute(iterator))
+            {
+                return feature.GetStringUserAttribute(FeatureFactory.CUT_CONDITION, 0);
+            }
+            return "";
+        }
         
         public string GetHoleCondition(Feature feature)
         {

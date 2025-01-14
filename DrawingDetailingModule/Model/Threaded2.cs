@@ -27,6 +27,7 @@ namespace DrawingDetailingModule.Model
 
         public override string ToString()
         {
+            string cutCondition = GetTAPECondition(feature);
             string depth = isThruThread ? "THRU" : $"DP {ThreadDepth:F1}";
             string result = "";
 
@@ -37,6 +38,11 @@ namespace DrawingDetailingModule.Model
             else if (ThreadStandard.Equals(METRIC_FINE))
             {
                 result = $"{GetProcessAbbrevate()} {ThreadSize} {depth}, DR <O>{TapDrill} THRU";
+            }
+
+            if (!cutCondition.Equals(""))
+            {
+                result = result + " " + cutCondition;
             }
 
             return result;

@@ -58,6 +58,18 @@ namespace DrawingDetailingModule.Model
             return result;
         }
 
+        public string ProcessWCType(string wcType)
+        {
+            if (!wcType.Equals("T/C", StringComparison.OrdinalIgnoreCase))
+            {
+                return wcType;
+            }
+            StringBuilder sb = new StringBuilder();
+            sb.Append(wcType);
+            sb.Append($" (L={HoleDepth}, T=1<$s>)");
+            return sb.ToString();
+        }
+
 
     }
 }

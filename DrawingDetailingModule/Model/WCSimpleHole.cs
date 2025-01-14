@@ -22,6 +22,7 @@ namespace DrawingDetailingModule.Model
         public override string ToString()
         {
             string wcType = GetWCCondition(feature);
+            wcType = ProcessWCType(wcType);
             string wcOffset = GetWCOffset(feature);
             WCStartPointDiamter = GetWCHoleSize(HoleDiameter);
 
