@@ -76,7 +76,8 @@ namespace DrawingDetailingModule.Model
             if (SymbolicThreads.Count > 0)
             {                
                 SymbolicThread x = SymbolicThreads[0];
-                description += $", TAP M{x.MajorDiameter}x{x.Pitch} DP {x.Length:F1}";
+                //description += $", TAP M{x.MajorDiameter}x{x.Pitch} DP {x.Length:F1}";
+                description += $", TAP M{x.MajorDiameter}x{x.Pitch} THRU";
             }
 
             return description;
