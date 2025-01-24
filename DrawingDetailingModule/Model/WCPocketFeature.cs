@@ -28,7 +28,7 @@ namespace DrawingDetailingModule.Model
 
             if (sketchFeat == null)
             {
-                return points;
+                throw new Exception("Wirecut Feature Error: The system cannot process the wirecut operation. Please create the Wirecut Profile using a sketch first!");
             }
 
             Line longestLine = null;

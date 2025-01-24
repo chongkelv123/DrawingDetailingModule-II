@@ -45,7 +45,7 @@ namespace DrawingDetailingModule.Model
             Part part = Session.GetSession().Parts.Work;
             AttributeIterator iterator = part.CreateAttributeIterator();
             iterator.SetIncludeOnlyTitle(TYPE);
-
+            
             switch (processType)
             {
                 case THREADED:
@@ -67,7 +67,7 @@ namespace DrawingDetailingModule.Model
         }
 
         private MyFeature PocketFeatureClassification(Feature feature, AttributeIterator iterator)
-        {
+        {                        
             string type;
             if (!feature.HasUserAttribute(iterator))
             {

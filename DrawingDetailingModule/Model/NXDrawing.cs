@@ -324,7 +324,7 @@ namespace DrawingDetailingModule.Model
 
             string description = wcFeat.ToString();
 
-            List<Point3d> points = wcFeat.GenerateLocation();
+            List<Point3d> points = wcFeat.GenerateLocation();                        
 
             AskBoundingBox boundingBox = new AskBoundingBox(ufs, selectedBody[0].Tag);
             double[] point = new double[3] { points[0].X, points[0].Y, points[0].Z };
