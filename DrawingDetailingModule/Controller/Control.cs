@@ -44,5 +44,10 @@ namespace DrawingDetailingModule.Controller
             }
             GetDrawing.SetTextSize(currentTextSize);
         }
+
+        public int GetDimensionTextSize()
+        {
+            return drawing.GetDimensionTextSize();
+        }
     }
 }

@@ -19,6 +19,22 @@ namespace DrawingDetailingModule.View
         {
             InitializeComponent();
             this.control = control;
+            InitNumFontSizeUpDownValue(control.GetDimensionTextSize);
+        }
+
+        private void InitNumFontSizeUpDownValue(Func<int> getDimensionTextSize)
+        {
+            int fontSize = GetFontSize(getDimensionTextSize);
+            numFontSizeUpDown.Value = fontSize;
+        }
+
+        private int GetFontSize(Func<int> getDimensionTextSize)
+        {
+            if (getDimensionTextSize() == 1)
+            {
+                return 1;
+            }            
+            return getDimensionTextSize() - 1;
         }
 
         private void btnCancel_Click(object sender, EventArgs e)

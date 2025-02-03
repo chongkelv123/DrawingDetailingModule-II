@@ -164,6 +164,8 @@ namespace DrawingDetailingModule.View
             this.numFontSizeUpDown.Name = "numFontSizeUpDown";
             this.numFontSizeUpDown.Size = new System.Drawing.Size(230, 22);
             this.numFontSizeUpDown.TabIndex = 3;
+            this.numFontSizeUpDown.Maximum = 15;
+            this.numFontSizeUpDown.Minimum = 1;
             this.numFontSizeUpDown.Value = new decimal(new int[] {
             8,
             0,

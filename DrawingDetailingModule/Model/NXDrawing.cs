@@ -108,6 +108,15 @@ namespace DrawingDetailingModule.Model
             return result;
         }
 
+        public int GetDimensionTextSize()
+        {
+            PmiPreferencesBuilder pmiPreferencesBuilder;
+            pmiPreferencesBuilder = workPart.PmiSettingsManager.CreatePreferencesBuilder();
+            int textSize = (int)pmiPreferencesBuilder.AnnotationStyle.LetteringStyle.DimensionTextSize;
+            pmiPreferencesBuilder.Destroy();
+            return textSize;
+        }
+
         public TableSection CreateTable(Point3d insertionPoint, List<MachiningDescriptionModel> descriptionModels)
         {
             int numOfColumns = 3, numOfRows = descriptionModels.Count + 1;
