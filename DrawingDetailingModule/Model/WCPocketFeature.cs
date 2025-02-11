@@ -18,7 +18,7 @@ namespace DrawingDetailingModule.Model
         public double Depth { get; set; }
         public bool IsThru { get; set; }
 
-        public WCPocketFeature(Feature feature) : base(feature) {}              
+        public WCPocketFeature(Feature feature) : base(feature) { }
 
         public override string GetProcessAbbrevate() => FeatureFactory.WC;
 
@@ -114,7 +114,8 @@ namespace DrawingDetailingModule.Model
         public override string ToString()
         {
             string wcType = GetWCCondition(feature);
-            wcType = ProcessWCType(wcType);
+            string slantCutAnlge = GetWCSlantCutAngle(feature);
+            wcType = ProcessWCType(wcType, slantCutAnlge);
             string wcOffset = GetWCOffset(feature);
             WCStartPointDiameter = GetWCStartPointDiam(35.0);
 
@@ -123,7 +124,7 @@ namespace DrawingDetailingModule.Model
             return description;
         }
 
-        private string ProcessWCType(string wcType)
+        private string ProcessWCType(string wcType, string slantCutAngle)
         {
             if(!wcType.Equals("T/C", StringComparison.OrdinalIgnoreCase))
             {
@@ -131,7 +132,7 @@ namespace DrawingDetailingModule.Model
             }
             StringBuilder sb = new StringBuilder();
             sb.Append(wcType);
-            sb.Append($" (L={Depth}, T=1<$s>)");
+            sb.Append($" (L={Depth}, T={slantCutAngle}<$s>)");
             return sb.ToString();
         }
 

@@ -66,6 +66,18 @@ namespace DrawingDetailingModule.Model
             }
             return @"S/C";
         }
+
+        public string GetWCSlantCutAngle(Feature feature)
+        {
+            AttributeIterator iterator = workPart.CreateAttributeIterator();
+
+            iterator.SetIncludeOnlyTitle(FeatureFactory.SLANT_CUT);
+            if (feature.HasUserAttribute(iterator))
+            {
+                return feature.GetStringUserAttribute(FeatureFactory.SLANT_CUT, 0);
+            }
+            return "1";
+        }
         
         public string GetMILLCondition(Feature feature)
         {

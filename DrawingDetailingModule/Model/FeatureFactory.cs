@@ -32,6 +32,7 @@ namespace DrawingDetailingModule.Model
         public const string DP = "DP";
         public const string SYMBOLIC_THREAD = "SYMBOLIC_THREAD";
         public const string PATTERN = "Pattern";
+        public const string SLANT_CUT = "SlantCut";
 
         public FeatureFactory()
         {
