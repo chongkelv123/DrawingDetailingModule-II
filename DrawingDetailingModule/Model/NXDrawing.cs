@@ -120,7 +120,7 @@ namespace DrawingDetailingModule.Model
         public TableSection CreateTable(Point3d insertionPoint, List<MachiningDescriptionModel> descriptionModels)
         {
             int numOfColumns = 3, numOfRows = descriptionModels.Count + 1;
-            double colWidth = 100.0;
+            double colWidth = 200.0;
             PmiTableSection nullPmiTableSection = null;
             PmiTableBuilder pmiTableBuilder;
             pmiTableBuilder = workPart.Annotations.PmiTableSections.CreatePmiTableBuilder(nullPmiTableSection);
@@ -148,17 +148,17 @@ namespace DrawingDetailingModule.Model
 
             ufs.Tabnot.AskCellAtRowCol(row, column, out cell);
             ufs.Tabnot.SetCellText(cell, "HOLE");
-            ufs.Tabnot.SetColumnWidth(column, 60);
+            ufs.Tabnot.SetColumnWidth(column, 25);
 
             ufs.Tabnot.AskNthColumn(tabNote, 1, out column);
             ufs.Tabnot.AskCellAtRowCol(row, column, out cell);
             ufs.Tabnot.SetCellText(cell, "DESCRIPTION");
-            ufs.Tabnot.SetColumnWidth(column, 200);
+            ufs.Tabnot.SetColumnWidth(column, 100);
 
             ufs.Tabnot.AskNthColumn(tabNote, 2, out column);
             ufs.Tabnot.AskCellAtRowCol(row, column, out cell);
             ufs.Tabnot.SetCellText(cell, "QTY");
-            ufs.Tabnot.SetColumnWidth(column, 60);
+            ufs.Tabnot.SetColumnWidth(column, 25);
 
             int numOfColumn = 3;        
 
