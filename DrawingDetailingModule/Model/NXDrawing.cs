@@ -120,20 +120,24 @@ namespace DrawingDetailingModule.Model
         public TableSection CreateTable(Point3d insertionPoint, List<MachiningDescriptionModel> descriptionModels)
         {
             int numOfColumns = 3, numOfRows = descriptionModels.Count + 1;
-            double colWidth = 200.0;
+                        
             PmiTableSection nullPmiTableSection = null;
             PmiTableBuilder pmiTableBuilder;
             pmiTableBuilder = workPart.Annotations.PmiTableSections.CreatePmiTableBuilder(nullPmiTableSection);
 
             pmiTableBuilder.NumberOfColumns = numOfColumns;
             pmiTableBuilder.NumberOfRows = numOfRows;
-            pmiTableBuilder.ColumnWidth = colWidth;
+            pmiTableBuilder.ColumnWidth = 200.0;
 
             pmiTableBuilder.Origin.OriginPoint = insertionPoint;
 
             NXObject tableObj = pmiTableBuilder.Commit(); 
 
             TableSection table = tableObj as TableSection;
+
+            double textSize = GetCurrentTextSize();
+            double columnWidth1 = Math.Ceiling(textSize * 5);
+            double columnWidth2 = Math.Ceiling(textSize * 20);
 
             table.SetName("Machining Table");
 
@@ -148,17 +152,17 @@ namespace DrawingDetailingModule.Model
 
             ufs.Tabnot.AskCellAtRowCol(row, column, out cell);
             ufs.Tabnot.SetCellText(cell, "HOLE");
-            ufs.Tabnot.SetColumnWidth(column, 25);
+            ufs.Tabnot.SetColumnWidth(column, columnWidth1);
 
             ufs.Tabnot.AskNthColumn(tabNote, 1, out column);
             ufs.Tabnot.AskCellAtRowCol(row, column, out cell);
             ufs.Tabnot.SetCellText(cell, "DESCRIPTION");
-            ufs.Tabnot.SetColumnWidth(column, 100);
+            ufs.Tabnot.SetColumnWidth(column, columnWidth2);
 
             ufs.Tabnot.AskNthColumn(tabNote, 2, out column);
             ufs.Tabnot.AskCellAtRowCol(row, column, out cell);
             ufs.Tabnot.SetCellText(cell, "QTY");
-            ufs.Tabnot.SetColumnWidth(column, 25);
+            ufs.Tabnot.SetColumnWidth(column, columnWidth1);
 
             int numOfColumn = 3;        
 
