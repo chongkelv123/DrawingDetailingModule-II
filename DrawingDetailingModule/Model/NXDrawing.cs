@@ -120,7 +120,7 @@ namespace DrawingDetailingModule.Model
         public TableSection CreateTable(Point3d insertionPoint, List<MachiningDescriptionModel> descriptionModels)
         {
             int numOfColumns = 3, numOfRows = descriptionModels.Count + 1;
-            double colWidth = 200.0;
+            double colWidth = 100.0;
             PmiTableSection nullPmiTableSection = null;
             PmiTableBuilder pmiTableBuilder;
             pmiTableBuilder = workPart.Annotations.PmiTableSections.CreatePmiTableBuilder(nullPmiTableSection);

@@ -105,6 +105,11 @@ namespace DrawingDetailingModule.Model
                 return new ReamSimpleHole(holePackage);
             }
 
+            if (type.Equals(MILL, StringComparison.OrdinalIgnoreCase))
+            {
+                return new MillSimpleHole(holePackage);
+            }
+
             return new WCSimpleHole(holePackage);
         }
 
