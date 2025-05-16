@@ -13,10 +13,11 @@ namespace DrawingDetailingModule.Controller
     {
         NXDrawing drawing;
         FormDrawingDetailing myForm;
-        
-        // Add a property that exposes the drawing as an ISelectionService
-        public ISelectionService SelectionService => drawing;
+
+        // Add property that exposes the drawing as an IFeatureProcessor
+        public IFeatureProcessor FeatureProcessor => drawing;
         // Keep the existing property for backward compatibility during refactoring
+        public ISelectionService SelectionService => drawing;
         public NXDrawing GetDrawing => drawing;
         public FormDrawingDetailing GetForm => myForm;
 
@@ -38,9 +39,10 @@ namespace DrawingDetailingModule.Controller
             List<MachiningDescriptionModel> descriptionModels = new List<MachiningDescriptionModel>();
             try
             {
-                descriptionModels = GetDrawing.IterateFeatures();
+                // Use the interface instead of direct class reference                
+                descriptionModels = FeatureProcessor.IterateFeatures();
                 GetDrawing.CreateTable(GetDrawing.LocatedPoint[0], descriptionModels);
-                GetDrawing.GenerateWCStartPoints(descriptionModels);
+                FeatureProcessor.GenerateWCStartPoints(descriptionModels);
             }
             catch (Exception err)
             {

@@ -22,7 +22,7 @@ namespace DrawingDetailingModule.Model
         MILL = 211,
         WC = 181,
     }
-    public class NXDrawing: ISelectionService
+    public class NXDrawing: ISelectionService, IFeatureProcessor
     {
         Session session;
         Part workPart;
@@ -310,7 +310,7 @@ namespace DrawingDetailingModule.Model
             return null;
         }
 
-        private MachiningDescriptionModel ProcessMillFeat(FeatureFactory factory, Feature feature)
+        public MachiningDescriptionModel ProcessMillFeat(FeatureFactory factory, Feature feature)
         {
             MillPocketFeature millFeat = factory.GetFeature(feature) as MillPocketFeature;
             millFeat.ufs = ufs;
@@ -329,7 +329,7 @@ namespace DrawingDetailingModule.Model
             return new MachiningDescriptionModel(description, points.Count, points, millFeat.GetProcessAbbrevate(), direction, height);
         }
 
-        private MachiningDescriptionModel ProcessWCFeat(FeatureFactory factory, Feature feature)
+        public MachiningDescriptionModel ProcessWCFeat(FeatureFactory factory, Feature feature)
         {
             WCPocketFeature wcFeat = factory.GetFeature(feature) as WCPocketFeature;
             wcFeat.ufs = ufs;
@@ -348,7 +348,7 @@ namespace DrawingDetailingModule.Model
             return new MachiningDescriptionModel(description, points.Count, points, wcFeat.GetProcessAbbrevate(), direction, height);
         }
 
-        private MachiningDescriptionModel ProcessHolePackage(FeatureFactory factory, Feature feature)
+        public MachiningDescriptionModel ProcessHolePackage(FeatureFactory factory, Feature feature)
         {
             MachiningDescriptionModel descModel;
             NXOpen.Features.HolePackage holePackage = feature as NXOpen.Features.HolePackage;
