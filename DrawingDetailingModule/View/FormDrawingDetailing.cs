@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using DrawingDetailingModule.Controller;
+using DrawingDetailingModule.Interfaces;
 
 namespace DrawingDetailingModule.View
 {
@@ -15,6 +16,8 @@ namespace DrawingDetailingModule.View
     {
         Controller.Control control;
         public double FontSize => (double)numFontSizeUpDown.Value;
+        // Add a property to access the selection service
+        private ISelectionService SelectionService => control.SelectionService;
         public FormDrawingDetailing(Controller.Control control)
         {
             InitializeComponent();
@@ -52,14 +55,14 @@ namespace DrawingDetailingModule.View
         private void updateBtnApplyStage()
         {
             btnApply.Enabled =
-                control.GetDrawing.IsFaceSelected &&
-                control.GetDrawing.IsPointLocated &&
+                SelectionService.IsFaceSelected &&
+                SelectionService.IsPointLocated &&
                 FontSize > 0;
         }
 
         private void updateBtnSelectFaceStage()
         {
-            if (control.GetDrawing.SelectedBody.Count > 0)
+            if (SelectionService.SelectedBody.Count > 0)
             {
                 btnSelectFace.Image = Properties.Resources.correct;
             }
@@ -84,7 +87,7 @@ namespace DrawingDetailingModule.View
 
         private void updateBtnPickPointStage()
         {
-            if (control.GetDrawing.LocatedPoint.Count > 0)
+            if (SelectionService.LocatedPoint.Count > 0)
             {
                 btnPickPoint.Image = Properties.Resources.correct;
             }

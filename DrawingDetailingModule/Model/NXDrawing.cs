@@ -12,6 +12,7 @@ using NXOpen.Features;
 using NXOpen.Annotations;
 using System.Windows.Forms;
 using NXOpen.CAE.Connections;
+using DrawingDetailingModule.Interfaces;
 
 namespace DrawingDetailingModule.Model
 {
@@ -21,7 +22,7 @@ namespace DrawingDetailingModule.Model
         MILL = 211,
         WC = 181,
     }
-    public class NXDrawing
+    public class NXDrawing: ISelectionService
     {
         Session session;
         Part workPart;
@@ -453,6 +454,11 @@ namespace DrawingDetailingModule.Model
                 return feature.GetStringUserAttribute(FeatureFactory.TYPE, 0);
             }
             return "";
+        }
+        public void ClearSelections()
+        {
+            selectedBody.Clear();
+            locatedPoint.Clear();
         }
 
     }

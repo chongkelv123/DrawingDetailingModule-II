@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DrawingDetailingModule.Model;
 using DrawingDetailingModule.View;
+using DrawingDetailingModule.Interfaces;
 
 namespace DrawingDetailingModule.Controller
 {
@@ -12,7 +13,10 @@ namespace DrawingDetailingModule.Controller
     {
         NXDrawing drawing;
         FormDrawingDetailing myForm;
-
+        
+        // Add a property that exposes the drawing as an ISelectionService
+        public ISelectionService SelectionService => drawing;
+        // Keep the existing property for backward compatibility during refactoring
         public NXDrawing GetDrawing => drawing;
         public FormDrawingDetailing GetForm => myForm;
 
