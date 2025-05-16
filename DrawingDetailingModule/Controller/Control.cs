@@ -12,8 +12,7 @@ namespace DrawingDetailingModule.Controller
 {
     public class Control: IController
     {        
-        FormDrawingDetailing myForm;        
-        public FormDrawingDetailing GetForm => myForm;
+        private FormDrawingDetailing myForm;                
 
         public void Initialize()
         {
@@ -37,10 +36,14 @@ namespace DrawingDetailingModule.Controller
                 descriptionModels = ServiceProvider.FeatureProcessor.IterateFeatures();
                 ServiceProvider.TableService.CreateTable(ServiceProvider.SelectionService.LocatedPoint[0], descriptionModels);
                 ServiceProvider.FeatureProcessor.GenerateWCStartPoints(descriptionModels);
+
+                // Use ShowInfo method to display success message
+                ServiceProvider.UIService.ShowInfo("Drawing detailing completed successfully.");
             }
             catch (Exception err)
             {
-                ServiceProvider.SessionProvider.ShowMessageBox("Error", NXOpen.NXMessageBox.DialogType.Error, $"Error detail: {err.Message}");
+                // Use ShowError method instead of directly calling ShowMessageBox
+                ServiceProvider.UIService.ShowError($"Error detail: {err.Message}");
             }
             ServiceProvider.SessionProvider.SetTextSize(currentTextSize);
         }

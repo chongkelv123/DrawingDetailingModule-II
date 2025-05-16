@@ -23,7 +23,7 @@ namespace DrawingDetailingModule.Interfaces
         /// <param name="factory">The feature factory</param>
         /// <param name="feature">The hole package feature</param>
         /// <returns>A machining description model</returns>
-        MachiningDescriptionModel ProcessHolePackage(FeatureFactory factory, Feature feature);
+        MachiningDescriptionModel ProcessHolePackage(IFeatureFactory factory, Feature feature);
 
         /// <summary>
         /// Processes a wire cut feature
@@ -31,7 +31,7 @@ namespace DrawingDetailingModule.Interfaces
         /// <param name="factory">The feature factory</param>
         /// <param name="feature">The extrude feature</param>
         /// <returns>A machining description model</returns>
-        MachiningDescriptionModel ProcessWCFeat(FeatureFactory factory, Feature feature);
+        MachiningDescriptionModel ProcessWCFeat(IFeatureFactory factory, Feature feature);
 
         /// <summary>
         /// Processes a mill feature
@@ -39,7 +39,7 @@ namespace DrawingDetailingModule.Interfaces
         /// <param name="factory">The feature factory</param>
         /// <param name="feature">The extrude feature</param>
         /// <returns>A machining description model</returns>
-        MachiningDescriptionModel ProcessMillFeat(FeatureFactory factory, Feature feature);
+        MachiningDescriptionModel ProcessMillFeat(IFeatureFactory factory, Feature feature);
 
         /// <summary>
         /// Generates wire cut start points for the provided description models

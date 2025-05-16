@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 using NXOpen;
 using NXOpen.CAM;
 using NXOpen.Features;
+using DrawingDetailingModule.Interfaces;
 
 namespace DrawingDetailingModule.Model
 {
-    public class FeatureFactory
+    public class FeatureFactory:IAbstractFeatureFactory
     {
         public const string THREADED = "THREADED";
         public const string DRILL = "DRILL";
@@ -34,71 +35,47 @@ namespace DrawingDetailingModule.Model
         public const string PATTERN = "Pattern";
         public const string SLANT_CUT = "SlantCut";
 
+        private readonly Part workPart;
         public FeatureFactory()
         {
+            workPart = Session.GetSession().Parts.Work;
         }
 
-        public MyFeature GetFeature(Feature feature)
+        public MyFeature CreateFeature(Feature feature)
         {            
             string processType = MyFeature.GetProcessType(feature);
             HolePackage holePackage = feature as HolePackage;
-
-            Part part = Session.GetSession().Parts.Work;
-            AttributeIterator iterator = part.CreateAttributeIterator();
+            
+            AttributeIterator iterator = workPart.CreateAttributeIterator();
             iterator.SetIncludeOnlyTitle(TYPE);
             
             switch (processType)
             {
                 case THREADED:
-                    return new Threaded2(holePackage);
+                    return CreateThreadedHole(holePackage);
                 case COUNTERBORED:
-                    return CounterBoreClassification(feature, iterator);
+                    return CreateCounterboreHole(feature, GetFeatureType(feature, iterator));
                 case SIMPLE:
-                    return SimpleHoleClassification(feature, iterator);
+                    return CreateSimpleHole(holePackage, GetFeatureType(feature, iterator));
                 case DRILL:
                     return new SimpleHole2(holePackage);
                 case EXTRUDE:
-                    return PocketFeatureClassification(feature, iterator);
+                    return CreatePocketFeature(feature, GetFeatureType(feature, iterator));
                 case COUNTERSUNK:
-                    return new CounterSunk(feature);
+                    return CreateCountersunkHole(feature);
                 default:
-                    throw new ArgumentNullException($"Error on: {processType}");
+                    throw new ArgumentNullException($"Unsupported feature type: {processType}", nameof(processType));
             }
 
         }
 
-        private MyFeature PocketFeatureClassification(Feature feature, AttributeIterator iterator)
-        {                        
-            string type;
-            if (!feature.HasUserAttribute(iterator))
-            {
-                throw new ArgumentNullException($"Error on: PocketFeatureClassifiction, no Type Value in Attribute.");
-            }
-
-            type = feature.GetStringUserAttribute(TYPE, 0);
-
-            if (type.Equals(FeatureFactory.WC, StringComparison.OrdinalIgnoreCase))
-            {
-                return new WCPocketFeature(feature);
-            }
-            else if (type.Equals(FeatureFactory.MILL, StringComparison.OrdinalIgnoreCase))
-            {
-                return new MillPocketFeature(feature);
-            }
-            throw new ArgumentNullException($"Error on: PocketFeatureClassifiction, Type Value is arbitrary.");
-        }
-
-        private MyFeature SimpleHoleClassification(Feature feature, AttributeIterator iterator)
+        // IHoleFeatureFactory implementation
+        public MyHoleFeature CreateSimpleHole(HolePackage holePackage, string type)
         {
-            HolePackage holePackage = feature as HolePackage;
-            string type;
-
-            if (!feature.HasUserAttribute(iterator))
+            if (string.IsNullOrEmpty(type))
             {
                 return new SimpleHole2(holePackage);
             }
-
-            type = feature.GetStringUserAttribute(TYPE, 0);
 
             if (type.Equals(REAM, StringComparison.OrdinalIgnoreCase))
             {
@@ -113,20 +90,60 @@ namespace DrawingDetailingModule.Model
             return new WCSimpleHole(holePackage);
         }
 
-        private MyFeature CounterBoreClassification(Feature feature, AttributeIterator iterator)
+        public MyHoleFeature CreateCounterboreHole(Feature feature, string type)
         {
-            if (!feature.HasUserAttribute(iterator))
+            if (string.IsNullOrEmpty(type))
             {
                 return new Counterbore2(feature);
             }
 
-            string type = feature.GetStringUserAttribute(TYPE, 0);
             if (type.Equals(REAM, StringComparison.OrdinalIgnoreCase))
             {
                 return new ReamCounterbore(feature);
             }
 
             return new WCCounterbore(feature);
+        }
+
+        public CounterSunk CreateCountersunkHole(Feature feature)
+        {
+            return new CounterSunk(feature);
+        }
+
+        public Threaded2 CreateThreadedHole(HolePackage holePackage)
+        {
+            return new Threaded2(holePackage);
+        }
+
+        // IPocketFeatureFactory implementation
+        public MyPocketFeature CreatePocketFeature(Feature feature, string type)
+        {
+            if (string.IsNullOrEmpty(type))
+            {
+                throw new ArgumentNullException(nameof(type), "Type cannot be null for pocket features");
+            }
+
+            if (type.Equals(WC, StringComparison.OrdinalIgnoreCase))
+            {
+                return new WCPocketFeature(feature);
+            }
+
+            if (type.Equals(MILL, StringComparison.OrdinalIgnoreCase))
+            {
+                return new MillPocketFeature(feature);
+            }
+
+            throw new ArgumentException($"Unsupported pocket feature type: {type}", nameof(type));
+        }
+
+        // Helper method to get feature type from attributes
+        private string GetFeatureType(Feature feature, AttributeIterator iterator)
+        {
+            if (feature.HasUserAttribute(iterator))
+            {
+                return feature.GetStringUserAttribute(TYPE, 0);
+            }
+            return string.Empty;
         }
     }
 }

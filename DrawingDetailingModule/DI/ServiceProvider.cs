@@ -31,5 +31,30 @@ namespace DrawingDetailingModule.DI
         /// Gets the table service
         /// </summary>
         public static ITableService TableService => ServiceLocator.Resolve<ITableService>();
+
+        /// <summary>
+        /// Gets the UI service
+        /// </summary>
+        public static IUIService UIService => ServiceLocator.Resolve<IUIService>();
+
+        /// <summary>
+        /// Gets the feature factory
+        /// </summary>
+        public static IFeatureFactory FeatureFactory => ServiceLocator.Resolve<IFeatureFactory>();
+
+        /// <summary>
+        /// Gets the hole feature factory
+        /// </summary>
+        public static IHoleFeatureFactory HoleFeatureFactory => ServiceLocator.Resolve<IHoleFeatureFactory>();
+
+        /// <summary>
+        /// Gets the pocket feature factory
+        /// </summary>
+        public static IPocketFeatureFactory PocketFeatureFactory => ServiceLocator.Resolve<IPocketFeatureFactory>();
+
+        /// <summary>
+        /// Gets the abstract feature factory
+        /// </summary>
+        public static IAbstractFeatureFactory AbstractFeatureFactory => ServiceLocator.Resolve<IAbstractFeatureFactory>();
     }
 }

@@ -13,6 +13,7 @@ using NXOpen.Annotations;
 using System.Windows.Forms;
 using NXOpen.CAE.Connections;
 using DrawingDetailingModule.Interfaces;
+using DrawingDetailingModule.DI;
 
 namespace DrawingDetailingModule.Model
 {
@@ -22,7 +23,7 @@ namespace DrawingDetailingModule.Model
         MILL = 211,
         WC = 181,
     }
-    public class NXDrawing: ISelectionService, IFeatureProcessor, INXSessionProvider, ITableService
+    public class NXDrawing: ISelectionService, IFeatureProcessor, INXSessionProvider, ITableService, IUIService
     {
         Session session;
         Part workPart;
@@ -238,11 +239,12 @@ namespace DrawingDetailingModule.Model
         public List<MachiningDescriptionModel> IterateFeatures()
         {
             var featureCollection = workPart.Features;
-            FeatureFactory factory = new FeatureFactory();
+            IFeatureFactory factory = ServiceProvider.FeatureFactory;
 
             List<MachiningDescriptionModel> descModels = new List<MachiningDescriptionModel>();
             MachiningDescriptionModel descModel;
             MachiningDescriptionModel tmpDescModel;
+
             foreach (Feature feature in featureCollection)
             {
                 if (feature.GetType() == typeof(NXOpen.Features.HolePackage))
@@ -265,7 +267,9 @@ namespace DrawingDetailingModule.Model
                         continue;
                     }
 
-                    if (GetTypeFromAttr(machiningAttIterator, feature).Equals(FeatureFactory.WC))
+                    string featureType = GetTypeFromAttr(machiningAttIterator, feature);
+
+                    if (featureType.Equals(FeatureFactory.WC))
                     {
                         descModel = ProcessWCFeat(factory, feature);
                         tmpDescModel = ProcessMachiningDescription(descModels, descModel);
@@ -274,7 +278,7 @@ namespace DrawingDetailingModule.Model
                             descModels.Add(tmpDescModel);
                         }
                     }
-                    else if (GetTypeFromAttr(machiningAttIterator, feature).Equals(FeatureFactory.MILL))
+                    else if (featureType.Equals(FeatureFactory.MILL))
                     {
                         descModel = ProcessMillFeat(factory, feature);
                         tmpDescModel = ProcessMachiningDescription(descModels, descModel);
@@ -303,9 +307,9 @@ namespace DrawingDetailingModule.Model
             return null;
         }
 
-        public MachiningDescriptionModel ProcessMillFeat(FeatureFactory factory, Feature feature)
+        public MachiningDescriptionModel ProcessMillFeat(IFeatureFactory factory, Feature feature)
         {
-            MillPocketFeature millFeat = factory.GetFeature(feature) as MillPocketFeature;
+            MillPocketFeature millFeat = factory.CreateFeature(feature) as MillPocketFeature;
             millFeat.ufs = ufs;
             millFeat.GetFeatureDetailInformation(feature);
             millFeat.SelectedBody = selectedBody[0];
@@ -322,9 +326,9 @@ namespace DrawingDetailingModule.Model
             return new MachiningDescriptionModel(description, points.Count, points, millFeat.GetProcessAbbrevate(), direction, height);
         }
 
-        public MachiningDescriptionModel ProcessWCFeat(FeatureFactory factory, Feature feature)
+        public MachiningDescriptionModel ProcessWCFeat(IFeatureFactory factory, Feature feature)
         {
-            WCPocketFeature wcFeat = factory.GetFeature(feature) as WCPocketFeature;
+            WCPocketFeature wcFeat = factory.CreateFeature(feature) as WCPocketFeature;
             wcFeat.ufs = ufs;
             wcFeat.GetFeatureDetailInformation(feature);
             wcFeat.SelectedBody = selectedBody[0];
@@ -341,11 +345,11 @@ namespace DrawingDetailingModule.Model
             return new MachiningDescriptionModel(description, points.Count, points, wcFeat.GetProcessAbbrevate(), direction, height);
         }
 
-        public MachiningDescriptionModel ProcessHolePackage(FeatureFactory factory, Feature feature)
+        public MachiningDescriptionModel ProcessHolePackage(IFeatureFactory factory, Feature feature)
         {
             MachiningDescriptionModel descModel;
             NXOpen.Features.HolePackage holePackage = feature as NXOpen.Features.HolePackage;
-            MyHoleFeature holeFeat = factory.GetFeature(feature) as MyHoleFeature;
+            MyHoleFeature holeFeat = factory.CreateFeature(feature) as MyHoleFeature;
             holeFeat.GetFeatureDetailInformation(feature);
             string description = holeFeat.ToString();           
 
@@ -472,6 +476,26 @@ namespace DrawingDetailingModule.Model
         public UI GetUI()
         {
             return ui;
+        }
+
+        public bool IsPartLoaded()
+        {
+            return workPart != null;
+        }
+
+        public void ShowInfo(string message)
+        {
+            ShowMessageBox("Information", NXMessageBox.DialogType.Information, message);
+        }
+
+        public void ShowError(string message)
+        {
+            ShowMessageBox("Error", NXMessageBox.DialogType.Error, message);
+        }
+
+        public void ShowWarning(string message)
+        {
+            ShowMessageBox("Warning", NXMessageBox.DialogType.Warning, message);
         }
     }
 }

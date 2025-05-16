@@ -18,9 +18,6 @@ namespace DrawingDetailingModule.View
     {
         private IController controller;
         public double FontSize => (double)numFontSizeUpDown.Value;
-        // Access interfaces through properties
-        //private ISelectionService SelectionService => control.SelectionService;
-        //private INXSessionProvider SessionProvider => control.SessionProvider;
         public FormDrawingDetailing(IController controller)
         {
             InitializeComponent();
@@ -84,10 +81,10 @@ namespace DrawingDetailingModule.View
             }
             catch (Exception err)
             {
-                ServiceProvider.SessionProvider.ShowMessageBox(
-                    "Error", 
-                    NXOpen.NXMessageBox.DialogType.Error, 
-                    $"You have accidentaly click the button twice.\n Here is the error message: {err.Message}.");
+                // Use UIService for showing error messages
+                ServiceProvider.UIService.ShowError(
+                    $"You have accidentally clicked the button twice.\nError: {err.Message}."
+                );
             }
         }
 

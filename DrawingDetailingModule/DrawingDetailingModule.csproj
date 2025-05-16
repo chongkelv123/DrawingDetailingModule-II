@@ -66,11 +66,14 @@
     <Compile Include="Controller\Control.cs" />
     <Compile Include="DI\ServiceLocator.cs" />
     <Compile Include="DI\ServiceProvider.cs" />
+    <Compile Include="Interfaces\IAbstractFeatureFactory.cs" />
     <Compile Include="Interfaces\IController.cs" />
+    <Compile Include="Interfaces\IFeatureFactory.cs" />
     <Compile Include="Interfaces\IFeatureProcessor.cs" />
     <Compile Include="Interfaces\INXSessionProvider.cs" />
     <Compile Include="Interfaces\ISelectionService.cs" />
     <Compile Include="Interfaces\ITableService.cs" />
+    <Compile Include="Interfaces\IUIService.cs" />
     <Compile Include="Main\MyProgram.cs" />
     <Compile Include="Model\AskBoundingBox.cs" />
     <Compile Include="Model\CounterSunk.cs" />
