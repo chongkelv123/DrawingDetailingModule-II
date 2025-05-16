@@ -22,7 +22,7 @@ namespace DrawingDetailingModule.Model
         MILL = 211,
         WC = 181,
     }
-    public class NXDrawing: ISelectionService, IFeatureProcessor
+    public class NXDrawing: ISelectionService, IFeatureProcessor, INXSessionProvider
     {
         Session session;
         Part workPart;
@@ -461,5 +461,24 @@ namespace DrawingDetailingModule.Model
             locatedPoint.Clear();
         }
 
+        public Session GetSession()
+        {
+            return session;
+        }
+
+        public UFSession GetUFSession()
+        {
+            return ufs;
+        }
+
+        public Part GetWorkPart()
+        {
+            return workPart;
+        }
+
+        public UI GetUI()
+        {
+            return ui;
+        }
     }
 }

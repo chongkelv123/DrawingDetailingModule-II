@@ -14,10 +14,10 @@ namespace DrawingDetailingModule.Controller
         NXDrawing drawing;
         FormDrawingDetailing myForm;
 
-        // Add property that exposes the drawing as an IFeatureProcessor
-        public IFeatureProcessor FeatureProcessor => drawing;
-        // Keep the existing property for backward compatibility during refactoring
+        // Expose interfaces for services
+        public IFeatureProcessor FeatureProcessor => drawing;        
         public ISelectionService SelectionService => drawing;
+        public INXSessionProvider SessionProvider => drawing;
         public NXDrawing GetDrawing => drawing;
         public FormDrawingDetailing GetForm => myForm;
 

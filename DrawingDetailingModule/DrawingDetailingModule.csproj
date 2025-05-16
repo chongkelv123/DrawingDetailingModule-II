@@ -65,6 +65,7 @@
   <ItemGroup>
     <Compile Include="Controller\Control.cs" />
     <Compile Include="Interfaces\IFeatureProcessor.cs" />
+    <Compile Include="Interfaces\INXSessionProvider.cs" />
     <Compile Include="Interfaces\ISelectionService.cs" />
     <Compile Include="Main\MyProgram.cs" />
     <Compile Include="Model\AskBoundingBox.cs" />

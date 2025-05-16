@@ -51,6 +51,21 @@
     <Reference Include="Moq, Version=4.7.0.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\packages\Moq.4.7.0\lib\net45\Moq.dll</HintPath>
     </Reference>
+    <Reference Include="NXOpen">
+      <HintPath>C:\tool\NX2212\NXBIN\managed\NXOpen.dll</HintPath>
+    </Reference>
+    <Reference Include="NXOpen.Guide">
+      <HintPath>C:\tool\NX2212\NXBIN\managed\NXOpen.Guide.dll</HintPath>
+    </Reference>
+    <Reference Include="NXOpen.UF">
+      <HintPath>C:\tool\NX2212\NXBIN\managed\NXOpen.UF.dll</HintPath>
+    </Reference>
+    <Reference Include="NXOpen.Utilities">
+      <HintPath>C:\tool\NX2212\NXBIN\managed\NXOpen.Utilities.dll</HintPath>
+    </Reference>
+    <Reference Include="NXOpenUI">
+      <HintPath>C:\tool\NX2212\NXBIN\managed\NXOpenUI.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <Choose>
@@ -62,7 +77,6 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="Model\AskBoundingBoxTests.cs" />
     <Compile Include="Model\MachiningDescriptionModelTests.cs" />
     <Compile Include="Model\NXDrawingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

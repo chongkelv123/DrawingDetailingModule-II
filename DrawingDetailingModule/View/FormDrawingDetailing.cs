@@ -16,8 +16,9 @@ namespace DrawingDetailingModule.View
     {
         Controller.Control control;
         public double FontSize => (double)numFontSizeUpDown.Value;
-        // Add a property to access the selection service
+        // Access interfaces through properties
         private ISelectionService SelectionService => control.SelectionService;
+        private INXSessionProvider SessionProvider => control.SessionProvider;
         public FormDrawingDetailing(Controller.Control control)
         {
             InitializeComponent();
@@ -78,7 +79,7 @@ namespace DrawingDetailingModule.View
             }
             catch (Exception err)
             {
-                control.GetDrawing.ShowMessageBox(
+                SessionProvider.ShowMessageBox(
                     "Error", 
                     NXOpen.NXMessageBox.DialogType.Error, 
                     $"You have accidentaly click the button twice.\n Here is the error message: {err.Message}.");
