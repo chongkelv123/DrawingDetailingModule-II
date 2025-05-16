@@ -67,6 +67,7 @@
     <Compile Include="Interfaces\IFeatureProcessor.cs" />
     <Compile Include="Interfaces\INXSessionProvider.cs" />
     <Compile Include="Interfaces\ISelectionService.cs" />
+    <Compile Include="Interfaces\ITableService.cs" />
     <Compile Include="Main\MyProgram.cs" />
     <Compile Include="Model\AskBoundingBox.cs" />
     <Compile Include="Model\CounterSunk.cs" />

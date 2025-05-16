@@ -22,7 +22,7 @@ namespace DrawingDetailingModule.Model
         MILL = 211,
         WC = 181,
     }
-    public class NXDrawing: ISelectionService, IFeatureProcessor, INXSessionProvider
+    public class NXDrawing: ISelectionService, IFeatureProcessor, INXSessionProvider, ITableService
     {
         Session session;
         Part workPart;
@@ -196,7 +196,7 @@ namespace DrawingDetailingModule.Model
             return table;
         }
 
-        private void PlaceAnnotation(List<Point3d> points, string alphabet)
+        public void PlaceAnnotation(List<Point3d> points, string alphabet)
         {
             string[] text_string = new string[1];
             text_string[0] = alphabet;
@@ -391,7 +391,7 @@ namespace DrawingDetailingModule.Model
                         double moveDistance = (wcDiameter / 2) - Math.Abs(wcspDiameter);
                         point = new Point3d(pt.X - moveDistance, pt.Y, pt.Z);
                     }
-                    CreateWCStartPoint(workPart, point, height, wcspDiameter, direction);
+                    this.CreateWCStartPoint(workPart, point, height, wcspDiameter, direction);
                 }
             }
         }

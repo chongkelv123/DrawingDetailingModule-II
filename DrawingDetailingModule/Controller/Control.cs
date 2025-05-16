@@ -15,9 +15,10 @@ namespace DrawingDetailingModule.Controller
         FormDrawingDetailing myForm;
 
         // Expose interfaces for services
-        public IFeatureProcessor FeatureProcessor => drawing;        
+        public IFeatureProcessor FeatureProcessor => drawing;
         public ISelectionService SelectionService => drawing;
         public INXSessionProvider SessionProvider => drawing;
+        public ITableService TableService => drawing;
         public NXDrawing GetDrawing => drawing;
         public FormDrawingDetailing GetForm => myForm;
 
@@ -41,7 +42,7 @@ namespace DrawingDetailingModule.Controller
             {
                 // Use the interface instead of direct class reference                
                 descriptionModels = FeatureProcessor.IterateFeatures();
-                GetDrawing.CreateTable(GetDrawing.LocatedPoint[0], descriptionModels);
+                TableService.CreateTable(GetDrawing.LocatedPoint[0], descriptionModels);
                 FeatureProcessor.GenerateWCStartPoints(descriptionModels);
             }
             catch (Exception err)
