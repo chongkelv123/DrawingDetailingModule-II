@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -8,22 +9,23 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using DrawingDetailingModule.Controller;
+using DrawingDetailingModule.DI;
 using DrawingDetailingModule.Interfaces;
 
 namespace DrawingDetailingModule.View
 {
     public partial class FormDrawingDetailing : Form
     {
-        Controller.Control control;
+        private IController controller;
         public double FontSize => (double)numFontSizeUpDown.Value;
         // Access interfaces through properties
-        private ISelectionService SelectionService => control.SelectionService;
-        private INXSessionProvider SessionProvider => control.SessionProvider;
-        public FormDrawingDetailing(Controller.Control control)
+        //private ISelectionService SelectionService => control.SelectionService;
+        //private INXSessionProvider SessionProvider => control.SessionProvider;
+        public FormDrawingDetailing(IController controller)
         {
             InitializeComponent();
-            this.control = control;
-            InitNumFontSizeUpDownValue(control.GetDimensionTextSize);
+            this.controller = controller;
+            InitNumFontSizeUpDownValue(controller.GetDimensionTextSize);
         }
 
         private void InitNumFontSizeUpDownValue(Func<int> getDimensionTextSize)
@@ -48,22 +50,24 @@ namespace DrawingDetailingModule.View
 
         private void btnSelectFace_Click(object sender, EventArgs e)
         {
-            control.GetDrawing.SelectedBody = control.GetDrawing.SelectBody();
+            var selectionService = ServiceProvider.SelectionService;
+            selectionService.SelectedBody = selectionService.SelectBody();
             updateBtnSelectFaceStage();
             updateBtnApplyStage();
         }
 
         private void updateBtnApplyStage()
         {
+            var selectionService = ServiceProvider.SelectionService;
             btnApply.Enabled =
-                SelectionService.IsFaceSelected &&
-                SelectionService.IsPointLocated &&
+                selectionService.IsFaceSelected &&
+                selectionService.IsPointLocated &&
                 FontSize > 0;
         }
 
         private void updateBtnSelectFaceStage()
         {
-            if (SelectionService.SelectedBody.Count > 0)
+            if (ServiceProvider.SelectionService.SelectedBody.Count > 0)
             {
                 btnSelectFace.Image = Properties.Resources.correct;
             }
@@ -73,13 +77,14 @@ namespace DrawingDetailingModule.View
         {            
             try
             {
-                control.GetDrawing.LocatedPoint = control.GetDrawing.SelectScreenPosition();
+                var selectionService = ServiceProvider.SelectionService;
+                selectionService.LocatedPoint = selectionService.SelectScreenPosition();
                 updateBtnPickPointStage();
                 updateBtnApplyStage();
             }
             catch (Exception err)
             {
-                SessionProvider.ShowMessageBox(
+                ServiceProvider.SessionProvider.ShowMessageBox(
                     "Error", 
                     NXOpen.NXMessageBox.DialogType.Error, 
                     $"You have accidentaly click the button twice.\n Here is the error message: {err.Message}.");
@@ -88,7 +93,7 @@ namespace DrawingDetailingModule.View
 
         private void updateBtnPickPointStage()
         {
-            if (SelectionService.LocatedPoint.Count > 0)
+            if (ServiceProvider.SelectionService.LocatedPoint.Count > 0)
             {
                 btnPickPoint.Image = Properties.Resources.correct;
             }
@@ -96,7 +101,7 @@ namespace DrawingDetailingModule.View
 
         private void btnApply_Click(object sender, EventArgs e)
         {
-            control.Start();
+            controller.Start();
             this.Close();
         }
 

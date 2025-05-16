@@ -6,55 +6,48 @@ using System.Threading.Tasks;
 using DrawingDetailingModule.Model;
 using DrawingDetailingModule.View;
 using DrawingDetailingModule.Interfaces;
+using DrawingDetailingModule.DI;
 
 namespace DrawingDetailingModule.Controller
 {
-    public class Control
-    {
-        NXDrawing drawing;
-        FormDrawingDetailing myForm;
-
-        // Expose interfaces for services
-        public IFeatureProcessor FeatureProcessor => drawing;
-        public ISelectionService SelectionService => drawing;
-        public INXSessionProvider SessionProvider => drawing;
-        public ITableService TableService => drawing;
-        public NXDrawing GetDrawing => drawing;
+    public class Control: IController
+    {        
+        FormDrawingDetailing myForm;        
         public FormDrawingDetailing GetForm => myForm;
 
-        public Control()
+        public void Initialize()
         {
-            drawing = new NXDrawing(this);
-            if (!drawing.IsDrawingOpen())
+            if (!ServiceProvider.SessionProvider.IsDrawingOpen())
             {
                 return;
             }
+
             myForm = new FormDrawingDetailing(this);
             myForm.Show();
         }
 
         public void Start()
         {            
-            double currentTextSize = GetDrawing.GetCurrentTextSize();
-            GetDrawing.SetTextSize(myForm.FontSize);
+            double currentTextSize = ServiceProvider.SessionProvider.GetCurrentTextSize();
+            ServiceProvider.SessionProvider.SetTextSize(myForm.FontSize);
             List<MachiningDescriptionModel> descriptionModels = new List<MachiningDescriptionModel>();
             try
             {
                 // Use the interface instead of direct class reference                
-                descriptionModels = FeatureProcessor.IterateFeatures();
-                TableService.CreateTable(GetDrawing.LocatedPoint[0], descriptionModels);
-                FeatureProcessor.GenerateWCStartPoints(descriptionModels);
+                descriptionModels = ServiceProvider.FeatureProcessor.IterateFeatures();
+                ServiceProvider.TableService.CreateTable(ServiceProvider.SelectionService.LocatedPoint[0], descriptionModels);
+                ServiceProvider.FeatureProcessor.GenerateWCStartPoints(descriptionModels);
             }
             catch (Exception err)
             {
-                GetDrawing.ShowMessageBox("Error", NXOpen.NXMessageBox.DialogType.Error, $"Error detail: {err.Message}");
+                ServiceProvider.SessionProvider.ShowMessageBox("Error", NXOpen.NXMessageBox.DialogType.Error, $"Error detail: {err.Message}");
             }
-            GetDrawing.SetTextSize(currentTextSize);
+            ServiceProvider.SessionProvider.SetTextSize(currentTextSize);
         }
 
         public int GetDimensionTextSize()
         {
-            return drawing.GetDimensionTextSize();
+            return ServiceProvider.SessionProvider.GetDimensionTextSize();
         }
     }
 }

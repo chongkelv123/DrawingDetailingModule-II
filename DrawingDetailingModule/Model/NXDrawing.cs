@@ -27,8 +27,7 @@ namespace DrawingDetailingModule.Model
         Session session;
         Part workPart;
         UI ui;
-        UFSession ufs;
-        Controller.Control control;
+        UFSession ufs;        
 
         List<TaggedObject> selectedBody;
         List<Point3d> locatedPoint;
@@ -43,13 +42,9 @@ namespace DrawingDetailingModule.Model
             set { locatedPoint = value; }
         }
         public bool IsFaceSelected => selectedBody.Count > 0;
-        public bool IsPointLocated => locatedPoint.Count > 0;
+        public bool IsPointLocated => locatedPoint.Count > 0;     
 
         public NXDrawing()
-        {
-        }
-
-        public NXDrawing(Controller.Control control)
         {
             session = Session.GetSession();
             ufs = UFSession.GetUFSession();
@@ -57,9 +52,7 @@ namespace DrawingDetailingModule.Model
             ui = UI.GetUI();
 
             selectedBody = new List<TaggedObject>();
-            locatedPoint = new List<Point3d>();
-
-            this.control = control;
+            locatedPoint = new List<Point3d>();            
         }
 
         public List<TaggedObject> SelectBody()

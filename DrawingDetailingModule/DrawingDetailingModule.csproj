@@ -64,6 +64,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controller\Control.cs" />
+    <Compile Include="DI\ServiceLocator.cs" />
+    <Compile Include="DI\ServiceProvider.cs" />
+    <Compile Include="Interfaces\IController.cs" />
     <Compile Include="Interfaces\IFeatureProcessor.cs" />
     <Compile Include="Interfaces\INXSessionProvider.cs" />
     <Compile Include="Interfaces\ISelectionService.cs" />
